@@ -1,0 +1,7 @@
+﻿{
+	"MongoSettings": {
+		"ConnectionUri": "ATLAS_URI_HERE",
+		"DatabaseName": "sample_mflix",
+		"CollectionName": "playlist"
+	}
+}
