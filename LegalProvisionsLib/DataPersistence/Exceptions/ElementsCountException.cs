@@ -1,6 +1,8 @@
-﻿namespace LegalProvisionsLib.DataPersistence.Exceptions;
+﻿using LegalProvisionsLib.Exceptions;
 
-public class ElementsCountException : Exception
+namespace LegalProvisionsLib.DataPersistence.Exceptions;
+
+public class ElementsCountException : ClientSideException
 {
     public ElementsCountException(string message) 
         : base(message)

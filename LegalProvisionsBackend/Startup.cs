@@ -1,4 +1,5 @@
-﻿using LegalProvisionsLib.DataPersistence;
+﻿using LegalProvisionsBackend.Middleware;
+using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Settings;
 
 namespace LegalProvisionsBackend;
@@ -23,6 +24,7 @@ public class Startup
     
     public void Configure(WebApplication app)
     {
+        app.UseMiddleware<ExceptionHandler>();
         app.MapControllers();
     }
 }
