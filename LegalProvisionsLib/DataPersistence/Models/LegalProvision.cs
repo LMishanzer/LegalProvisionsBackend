@@ -6,7 +6,7 @@ namespace LegalProvisionsLib.DataPersistence.Models;
 public class LegalProvision
 {
     [BsonId]
-    public ObjectId Id { get; set; }
+    public Guid Id { get; set; }
     
     [BsonElement(elementName: "title")]
     public string Title { get; set; }

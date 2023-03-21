@@ -20,8 +20,8 @@ public class ProvisionsController : Controller
         return await _dataPersistence.GetAllProvisionsAsync();
     }
     
-    [HttpGet("{id}")]
-    public async Task<LegalProvision> GetOne(string id)
+    [HttpGet("{id:guid}")]
+    public async Task<LegalProvision> GetOne(Guid id)
     {
         return await _dataPersistence.GetProvisionAsync(id);
     }
@@ -34,16 +34,16 @@ public class ProvisionsController : Controller
         return Ok(objectId);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] LegalProvisionUpdate provision)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] LegalProvisionUpdate provision)
     {
         await _dataPersistence.UpdateProvisionAsync(id, provision);
 
         return Ok();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
         await _dataPersistence.DeleteProvisionAsync(id);
 

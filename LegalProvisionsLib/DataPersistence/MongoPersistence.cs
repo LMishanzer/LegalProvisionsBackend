@@ -22,13 +22,9 @@ public class MongoPersistence : IDataPersistence
         return await _provisionCollection.Find(new BsonDocument()).ToListAsync();
     }
 
-    public async Task<LegalProvision> GetProvisionAsync(string id)
+    public async Task<LegalProvision> GetProvisionAsync(Guid id)
     {
-        var provisionList = await _provisionCollection.Find(
-            new BsonDocument(
-                new BsonElement("_id", new BsonObjectId(new ObjectId(id)))
-            )
-        ).ToListAsync();
+        var provisionList = await _provisionCollection.Find(GetFilter(id)).ToListAsync();
 
         return provisionList.Count switch
         {
@@ -38,40 +34,41 @@ public class MongoPersistence : IDataPersistence
         };
     }
 
-    public async Task<string> AddProvisionAsync(LegalProvision provision)
+    public async Task<Guid> AddProvisionAsync(LegalProvision provision)
     {
-        provision.Id = ObjectId.GenerateNewId();
+        provision.Id = Guid.NewGuid();
         await _provisionCollection.InsertOneAsync(provision);
 
-        return provision.Id.ToString();
+        return provision.Id;
     }
 
-    public async Task UpdateProvisionAsync(string id, LegalProvisionUpdate newProvision)
+    public async Task UpdateProvisionAsync(Guid id, LegalProvisionUpdate newProvision)
     {
         var provision = await GetProvisionAsync(id);
-
-        var filter = new BsonDocument(
-            new BsonElement("_id", new BsonObjectId(new ObjectId(id)))
-        );
 
         provision.Title = newProvision.Title;
         provision.Articles = newProvision.Articles;
 
-        var updateResult = await _provisionCollection.ReplaceOneAsync(filter, provision);
+        var updateResult = await _provisionCollection.ReplaceOneAsync(GetFilter(id), provision);
 
         if (updateResult.ModifiedCount > 1)
             throw new NotImplementedException();
     }
 
-    public async Task DeleteProvisionAsync(string id)
+    public async Task DeleteProvisionAsync(Guid id)
     {
         await GetProvisionAsync(id);
 
-        var deleteResult = await _provisionCollection.DeleteOneAsync(new BsonDocument(
-            new BsonElement("_id", new BsonObjectId(new ObjectId(id)))
-        ));
+        var deleteResult = await _provisionCollection.DeleteOneAsync(GetFilter(id));
         
         if (deleteResult.DeletedCount > 1)
             throw new NotImplementedException();
+    }
+    
+    private static BsonDocument GetFilter(Guid id)
+    {
+        return new BsonDocument(
+            new BsonElement("_id", id)
+        );
     }
 }

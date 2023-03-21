@@ -6,11 +6,11 @@ public interface IDataPersistence
 {
     public Task<IEnumerable<LegalProvision>> GetAllProvisionsAsync();
 
-    public Task<LegalProvision> GetProvisionAsync(string id);
+    public Task<LegalProvision> GetProvisionAsync(Guid id);
 
-    public Task<string> AddProvisionAsync(LegalProvision provision);
+    public Task<Guid> AddProvisionAsync(LegalProvision provision);
 
-    public Task UpdateProvisionAsync(string id, LegalProvisionUpdate newProvision);
+    public Task UpdateProvisionAsync(Guid id, LegalProvisionUpdate newProvision);
 
-    public Task DeleteProvisionAsync(string id);
+    public Task DeleteProvisionAsync(Guid id);
 }
