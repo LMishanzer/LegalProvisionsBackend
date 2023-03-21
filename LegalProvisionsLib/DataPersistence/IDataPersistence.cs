@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using LegalProvisionsLib.DataPersistence.Models;
+﻿using LegalProvisionsLib.DataPersistence.Models;
 
 namespace LegalProvisionsLib.DataPersistence;
 
@@ -11,7 +10,7 @@ public interface IDataPersistence
 
     public Task<string> AddProvisionAsync(LegalProvision provision);
 
-    public Task UpdateProvisionAsync(LegalProvision provision);
+    public Task UpdateProvisionAsync(string id, LegalProvisionUpdate newProvision);
 
     public Task DeleteProvisionAsync(string id);
 }

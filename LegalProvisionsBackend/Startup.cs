@@ -14,15 +14,15 @@ public class Startup
     
     public void ConfigureServices(IServiceCollection services)
     {
-        var settings = new SettingsReader().ReadSettings($"Settings{Path.PathSeparator}server.settings.json");
-        MongoSettings.Instance = settings.MongoSettings;
+        var settings = new SettingsReader().ReadSettings($"Settings\\server.settings.json");
 
+        services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
         services.AddTransient<IDataPersistence, MongoPersistence>();
         services.AddControllers();
     }
     
-    public void Configure(IApplicationBuilder app)
+    public void Configure(WebApplication app)
     {
-        
+        app.MapControllers();
     }
 }

@@ -15,20 +15,38 @@ public class ProvisionsController : Controller
     }
 
     [HttpGet]
-    public async Task<IEnumerable<LegalProvision>> GetAllProvisions()
+    public async Task<IEnumerable<LegalProvision>> GetAll()
     {
         return await _dataPersistence.GetAllProvisionsAsync();
     }
     
     [HttpGet("{id}")]
-    public async Task<LegalProvision> GetProvision(string id)
+    public async Task<LegalProvision> GetOne(string id)
     {
         return await _dataPersistence.GetProvisionAsync(id);
     }
     
     [HttpPost]
-    public async Task CreateProvision([FromBody] LegalProvision provision)
+    public async Task<IActionResult> Create([FromBody] LegalProvision provision)
     {
-        await _dataPersistence.AddProvisionAsync(provision);
+        var objectId = await _dataPersistence.AddProvisionAsync(provision);
+        
+        return Ok(objectId);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] LegalProvisionUpdate provision)
+    {
+        await _dataPersistence.UpdateProvisionAsync(id, provision);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await _dataPersistence.DeleteProvisionAsync(id);
+
+        return Ok();
     }
 }

@@ -1,7 +1,7 @@
 ﻿{
 	"MongoSettings": {
-		"ConnectionUri": "ATLAS_URI_HERE",
-		"DatabaseName": "sample_mflix",
-		"CollectionName": "playlist"
+		"ConnectionUri": "mongodb://root:StrongPassword2023!@localhost:27017/?authMechanism=SCRAM-SHA-256",
+		"DatabaseName": "LegalProvisions",
+		"CollectionName": "LegalProvisions"
 	}
 }
