@@ -6,6 +6,8 @@ namespace LegalProvisionsBackend;
 
 public class Startup
 {
+    private const string CorsPolicy = "AllowSpecificOrigins";
+    
     public IConfigurationRoot Configuration { get; }
     
     public Startup(IConfigurationRoot configuration)
@@ -20,11 +22,20 @@ public class Startup
         services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
         services.AddTransient<IDataPersistence, MongoPersistence>();
         services.AddControllers();
+        services.AddCors(options =>
+        {
+            options.AddPolicy(name: CorsPolicy,
+                policy  =>
+                {
+                    policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+                });
+        });
     }
     
     public void Configure(WebApplication app)
     {
         app.UseMiddleware<ExceptionHandler>();
         app.MapControllers();
+        app.UseCors(CorsPolicy);
     }
 }

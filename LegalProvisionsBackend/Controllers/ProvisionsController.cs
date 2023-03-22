@@ -27,17 +27,17 @@ public class ProvisionsController : Controller
     }
     
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] LegalProvision provision)
+    public async Task<IActionResult> Create([FromBody] LegalProvisionFields provisionFields)
     {
-        var objectId = await _dataPersistence.AddProvisionAsync(provision);
+        var objectId = await _dataPersistence.AddProvisionAsync(provisionFields);
         
         return Ok(objectId);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] LegalProvisionUpdate provision)
+    public async Task<IActionResult> Update(Guid id, [FromBody] LegalProvisionFields provisionFields)
     {
-        await _dataPersistence.UpdateProvisionAsync(id, provision);
+        await _dataPersistence.UpdateProvisionAsync(id, provisionFields);
 
         return Ok();
     }

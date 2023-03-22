@@ -8,9 +8,9 @@ public interface IDataPersistence
 
     public Task<LegalProvision> GetProvisionAsync(Guid id);
 
-    public Task<Guid> AddProvisionAsync(LegalProvision provision);
+    public Task<Guid> AddProvisionAsync(LegalProvisionFields provisionFields);
 
-    public Task UpdateProvisionAsync(Guid id, LegalProvisionUpdate newProvision);
+    public Task UpdateProvisionAsync(Guid id, LegalProvisionFields updatedProvisionFields);
 
     public Task DeleteProvisionAsync(Guid id);
 }

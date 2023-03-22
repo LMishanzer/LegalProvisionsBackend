@@ -34,20 +34,18 @@ public class MongoPersistence : IDataPersistence
         };
     }
 
-    public async Task<Guid> AddProvisionAsync(LegalProvision provision)
+    public async Task<Guid> AddProvisionAsync(LegalProvisionFields provisionFields)
     {
-        provision.Id = Guid.NewGuid();
+        var provision = new LegalProvision(provisionFields);
         await _provisionCollection.InsertOneAsync(provision);
 
         return provision.Id;
     }
 
-    public async Task UpdateProvisionAsync(Guid id, LegalProvisionUpdate newProvision)
+    public async Task UpdateProvisionAsync(Guid id, LegalProvisionFields newProvisionFields)
     {
         var provision = await GetProvisionAsync(id);
-
-        provision.Title = newProvision.Title;
-        provision.Articles = newProvision.Articles;
+        provision.Fields = newProvisionFields;
 
         var updateResult = await _provisionCollection.ReplaceOneAsync(GetFilter(id), provision);
 
