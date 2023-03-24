@@ -49,4 +49,12 @@ public class ProvisionsController : Controller
 
         return Ok();
     }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAll()
+    {
+        await _dataPersistence.DeleteAllProvisionsAsync();
+
+        return Ok();
+    }
 }

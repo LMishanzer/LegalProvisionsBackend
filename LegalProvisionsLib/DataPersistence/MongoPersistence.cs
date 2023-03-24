@@ -62,7 +62,9 @@ public class MongoPersistence : IDataPersistence
         if (deleteResult.DeletedCount > 1)
             throw new NotImplementedException();
     }
-    
+
+    public async Task DeleteAllProvisionsAsync() => await _provisionCollection.DeleteManyAsync(new BsonDocument());
+
     private static BsonDocument GetFilter(Guid id)
     {
         return new BsonDocument(

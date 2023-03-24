@@ -13,4 +13,6 @@ public interface IDataPersistence
     public Task UpdateProvisionAsync(Guid id, LegalProvisionFields updatedProvisionFields);
 
     public Task DeleteProvisionAsync(Guid id);
+
+    public Task DeleteAllProvisionsAsync();
 }
