@@ -4,9 +4,6 @@ namespace LegalProvisionsLib.DataPersistence.Models;
 
 public class LegalProvisionFields
 {
-    [BsonElement(elementName: "title")]
-    public string? Title { get; set; }
-
     [BsonElement(elementName: "key_words")]
     public IEnumerable<string>? KeyWords { get; set; }
 
