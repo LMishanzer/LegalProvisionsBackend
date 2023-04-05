@@ -4,33 +4,21 @@ namespace LegalProvisionsLib.DataPersistence.Models;
 
 public class ContentItem
 {
-    [BsonElement(elementName: "name")]
-    public string Name { get; set; }
+    [BsonElement(elementName: "id")]
+    public Guid Id { get; set; }
     
     [BsonElement(elementName: "title")]
-    public string? Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     [BsonElement(elementName: "text_main")]
-    public string? TextMain { get; set; }
+    public string TextMain { get; set; } = string.Empty;
     
     [BsonElement(elementName: "inner_items")]
-    public IEnumerable<ContentItem>? InnerItems { get; set; }
+    public IEnumerable<ContentItem> InnerItems { get; set; } = Array.Empty<ContentItem>();
 
-    public void ValidateStructure()
-    {
-        if (InnerItems == null || !InnerItems.Any())
-            return;
+    [BsonElement(elementName: "inner_items_type")]
+    public string InnerItemsType { get; set; } = string.Empty;
 
-        var elNames = InnerItems.First().Name;
-        
-        foreach (var innerItem in InnerItems)
-        {
-            innerItem.ValidateStructure();
-
-            if (!elNames.Equals(innerItem.Name))
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
+    [BsonElement(elementName: "text_elements")]
+    public IEnumerable<TextElement> TextElements { get; set; } = Array.Empty<TextElement>();
 }
