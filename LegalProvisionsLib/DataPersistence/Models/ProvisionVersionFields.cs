@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Collections.Immutable;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
@@ -17,4 +18,9 @@ public class ProvisionVersionFields
 
     [BsonElement(elementName: "content")]
     public ContentItem? Content { get; set; }
+
+    public IEnumerable<ContentItem> GetAllContentDictionary()
+    {
+        return Content?.GetAllContentInArray() ?? Array.Empty<ContentItem>();
+    }
 }

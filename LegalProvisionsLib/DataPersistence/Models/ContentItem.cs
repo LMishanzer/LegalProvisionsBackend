@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Collections.Immutable;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
@@ -13,12 +14,29 @@ public class ContentItem
     [BsonElement(elementName: "text_main")]
     public string TextMain { get; set; } = string.Empty;
     
+    [BsonElement(elementName: "inner_items_type")]
+    public string InnerItemsType { get; set; } = string.Empty;
+    
     [BsonElement(elementName: "inner_items")]
     public IEnumerable<ContentItem> InnerItems { get; set; } = Array.Empty<ContentItem>();
 
-    [BsonElement(elementName: "inner_items_type")]
-    public string InnerItemsType { get; set; } = string.Empty;
+    public IEnumerable<ContentItem> GetAllContentInArray()
+    {
+        var list = new List<ContentItem>();
 
-    [BsonElement(elementName: "text_elements")]
-    public IEnumerable<TextElement> TextElements { get; set; } = Array.Empty<TextElement>();
+        foreach (var contentItem in InnerItems)
+        {
+            list.AddRange(contentItem.GetAllContentInArray());
+        }
+
+        list.Add(this);
+
+        return list;
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return Id.GetHashCode();
+    }
 }

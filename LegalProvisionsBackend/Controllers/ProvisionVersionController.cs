@@ -1,5 +1,7 @@
 ﻿using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.DataPersistence.Models;
+using LegalProvisionsLib.Differences;
+using LegalProvisionsLib.Differences.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LegalProvisionsBackend.Controllers;
@@ -8,10 +10,12 @@ namespace LegalProvisionsBackend.Controllers;
 public class ProvisionVersionController : Controller
 {
     private readonly MongoPersistence _dataPersistence;
+    private readonly IDifferenceCalculator _differenceCalculator;
 
-    public ProvisionVersionController(MongoPersistence dataPersistence)
+    public ProvisionVersionController(MongoPersistence dataPersistence, IDifferenceCalculator differenceCalculator)
     {
         _dataPersistence = dataPersistence;
+        _differenceCalculator = differenceCalculator;
     }
 
     [HttpGet]
@@ -36,6 +40,15 @@ public class ProvisionVersionController : Controller
     public async Task<ProvisionVersion> GetActualProvisionVersion(Guid headerId)
     {
         return await _dataPersistence.GetActualVersionAsync(headerId);
+    }
+
+    [HttpGet("{originalId:guid}/{changedId:guid}")]
+    public async Task<ProvisionDifference> GetDifferences(Guid originalId, Guid changedId)
+    {
+        var original = await _dataPersistence.GetProvisionAsync(originalId);
+        var changed = await _dataPersistence.GetProvisionAsync(changedId);
+        
+        return _differenceCalculator.CalculateDifferences(original, changed);
     }
 
     [HttpPost]

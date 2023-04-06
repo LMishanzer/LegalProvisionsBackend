@@ -1,5 +1,6 @@
 ﻿using LegalProvisionsBackend.Middleware;
 using LegalProvisionsLib.DataPersistence;
+using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Settings;
 
 namespace LegalProvisionsBackend;
@@ -21,6 +22,7 @@ public class Startup
 
         services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
         services.AddTransient<MongoPersistence>();
+        services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
         services.AddControllers();
         services.AddCors(options =>
         {
