@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
@@ -8,13 +7,14 @@ public class ProvisionVersionFields
     [BsonElement(elementName: "provision_header")]
     public Guid ProvisionHeader { get; set; }
 
-    [BsonElement(elementName: "issue_time")]
-    public DateTime? IssueTime { get; set; }
+    [BsonElement(elementName: "issue_date")]
+    public DateOnly IssueDate { get; set; }
 
-    public DateTime? ValidFrom { get; set; }
+    [BsonElement(elementName: "valid_from")]
+    public DateOnly ValidFrom { get; set; }
 
     [BsonElement("takes_effect_from")]
-    public DateTime? TakesEffectFrom { get; set; }
+    public DateOnly TakesEffectFrom { get; set; }
 
     [BsonElement(elementName: "content")]
     public ContentItem? Content { get; set; }

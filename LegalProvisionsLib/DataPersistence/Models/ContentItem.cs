@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
