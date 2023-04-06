@@ -4,13 +4,13 @@ namespace LegalProvisionsLib.DataPersistence;
 
 public interface IDataPersistence
 {
-    public Task<IEnumerable<LegalProvision>> GetAllProvisionsAsync();
+    public Task<IEnumerable<ProvisionVersion>> GetAllProvisionsAsync();
 
-    public Task<LegalProvision> GetProvisionAsync(Guid id);
+    public Task<ProvisionVersion> GetProvisionAsync(Guid id);
 
-    public Task<Guid> AddProvisionAsync(LegalProvisionFields provisionFields);
+    public Task<Guid> AddProvisionAsync(ProvisionVersionFields provisionVersionFields);
 
-    public Task UpdateProvisionAsync(Guid id, LegalProvisionFields updatedProvisionFields);
+    public Task UpdateProvisionAsync(Guid id, ProvisionVersionFields updatedProvisionVersionFields);
 
     public Task DeleteProvisionAsync(Guid id);
 

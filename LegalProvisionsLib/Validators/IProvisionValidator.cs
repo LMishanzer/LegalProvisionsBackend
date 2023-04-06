@@ -4,5 +4,5 @@ namespace LegalProvisionsLib.Validators;
 
 public interface IProvisionValidator
 {
-    bool Validate(LegalProvision provision);
+    bool Validate(ProvisionVersion provisionVersion);
 }

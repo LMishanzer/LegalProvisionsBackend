@@ -20,7 +20,7 @@ public class Startup
         var settings = new SettingsReader().ReadSettings($"Settings\\server.settings.json");
 
         services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
-        services.AddTransient<IDataPersistence, MongoPersistence>();
+        services.AddTransient<MongoPersistence>();
         services.AddControllers();
         services.AddCors(options =>
         {

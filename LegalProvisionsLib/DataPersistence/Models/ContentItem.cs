@@ -5,7 +5,7 @@ namespace LegalProvisionsLib.DataPersistence.Models;
 public class ContentItem
 {
     [BsonElement(elementName: "id")]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     [BsonElement(elementName: "title")]
     public string Title { get; set; } = string.Empty;

@@ -2,7 +2,7 @@
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
-public class LegalProvision
+public class DataItem<T> where T: class
 {
     [BsonId]
     public Guid Id { get; set; }
@@ -11,9 +11,9 @@ public class LegalProvision
     public DateTime CreationTime { get; set; }
 
     [BsonElement(elementName: "fields")]
-    public LegalProvisionFields Fields { get; set; }
-
-    public LegalProvision(LegalProvisionFields fields)
+    public T Fields { get; set; }
+    
+    public DataItem(T fields)
     {
         Id = Guid.NewGuid();
         CreationTime = DateTime.Now;

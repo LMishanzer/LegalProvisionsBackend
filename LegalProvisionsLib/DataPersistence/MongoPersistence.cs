@@ -8,23 +8,26 @@ namespace LegalProvisionsLib.DataPersistence;
 
 public class MongoPersistence : IDataPersistence
 {
-    private readonly IMongoCollection<LegalProvision> _provisionCollection;
+    private readonly IMongoDatabase _mongoDatabase;
+    private readonly IMongoCollection<ProvisionVersion> _provisionCollection;
     
     public MongoPersistence(MongoSettings mongoSettings)
     {
         var client = new MongoClient(mongoSettings.ConnectionUri);
-        var database = client.GetDatabase(mongoSettings.DatabaseName);
-        _provisionCollection = database.GetCollection<LegalProvision>(mongoSettings.CollectionName);
+        _mongoDatabase = client.GetDatabase(mongoSettings.DatabaseName);
+        _provisionCollection = _mongoDatabase.GetCollection<ProvisionVersion>("ProvisionVersions");
     }
-    
-    public async Task<IEnumerable<LegalProvision>> GetAllProvisionsAsync()
+
+    #region ProvisionVersions
+
+    public async Task<IEnumerable<ProvisionVersion>> GetAllProvisionsAsync()
     {
         return await _provisionCollection.Find(new BsonDocument()).ToListAsync();
     }
 
-    public async Task<LegalProvision> GetProvisionAsync(Guid id)
+    public async Task<ProvisionVersion> GetProvisionAsync(Guid id)
     {
-        var provisionList = await _provisionCollection.Find(GetFilter(id)).ToListAsync();
+        var provisionList = await _provisionCollection.Find(GetFilterById(id)).ToListAsync();
 
         return provisionList.Count switch
         {
@@ -34,20 +37,27 @@ public class MongoPersistence : IDataPersistence
         };
     }
 
-    public async Task<Guid> AddProvisionAsync(LegalProvisionFields provisionFields)
+    public async Task<IEnumerable<ProvisionVersion>> GetVersionsByHeaderIdAsync(Guid headerId)
     {
-        var provision = new LegalProvision(provisionFields);
+        var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId);
+
+        return await _provisionCollection.Find(filter).ToListAsync();
+    }
+
+    public async Task<Guid> AddProvisionAsync(ProvisionVersionFields provisionVersionFields)
+    {
+        var provision = new ProvisionVersion(provisionVersionFields);
         await _provisionCollection.InsertOneAsync(provision);
 
         return provision.Id;
     }
 
-    public async Task UpdateProvisionAsync(Guid id, LegalProvisionFields newProvisionFields)
+    public async Task UpdateProvisionAsync(Guid id, ProvisionVersionFields newProvisionVersionFields)
     {
         var provision = await GetProvisionAsync(id);
-        provision.Fields = newProvisionFields;
+        provision.Fields = newProvisionVersionFields;
 
-        var updateResult = await _provisionCollection.ReplaceOneAsync(GetFilter(id), provision);
+        var updateResult = await _provisionCollection.ReplaceOneAsync(GetFilterById(id), provision);
 
         if (updateResult.ModifiedCount > 1)
             throw new NotImplementedException();
@@ -57,15 +67,52 @@ public class MongoPersistence : IDataPersistence
     {
         await GetProvisionAsync(id);
 
-        var deleteResult = await _provisionCollection.DeleteOneAsync(GetFilter(id));
+        var deleteResult = await _provisionCollection.DeleteOneAsync(GetFilterById(id));
         
         if (deleteResult.DeletedCount > 1)
             throw new NotImplementedException();
     }
 
     public async Task DeleteAllProvisionsAsync() => await _provisionCollection.DeleteManyAsync(new BsonDocument());
+ 
+    #endregion
 
-    private static BsonDocument GetFilter(Guid id)
+    #region ProvisionHeaders
+
+    public async Task<IEnumerable<ProvisionHeader>> GetAllProvisionHeadersAsync()
+    {
+        var provisionHeadersCollection = GetProvisionHeadersCollection();
+
+        return await provisionHeadersCollection.Find(new BsonDocument()).ToListAsync();
+    }
+    
+    public async Task<ProvisionHeader> GetProvisionHeaderAsync(Guid id)
+    {
+        var provisionHeadersCollection = GetProvisionHeadersCollection();
+
+        var foundHeaders = await provisionHeadersCollection.Find(GetFilterById(id)).ToListAsync();
+
+        if (foundHeaders.Count != 1)
+            throw new ElementsCountException("Wrong amount of ProvisionHeaders was found.");
+
+        return foundHeaders.First();
+    }
+    
+    public async Task<Guid> AddProvisionHeaderAsync(ProvisionHeaderFields fields)
+    {
+        var provisionHeader = new ProvisionHeader(fields);
+        var provisionHeadersCollection = GetProvisionHeadersCollection();
+
+        await provisionHeadersCollection.InsertOneAsync(provisionHeader);
+
+        return provisionHeader.Id;
+    }
+    
+    private IMongoCollection<ProvisionHeader> GetProvisionHeadersCollection() => _mongoDatabase.GetCollection<ProvisionHeader>("ProvisionHeaders");
+
+    #endregion
+
+    private static BsonDocument GetFilterById(Guid id)
     {
         return new BsonDocument(
             new BsonElement("_id", id)

@@ -4,7 +4,7 @@ namespace LegalProvisionsLib.Validators;
 
 public class TypeValidator : IProvisionValidator
 {
-    public bool Validate(LegalProvision provision)
+    public bool Validate(ProvisionVersion provisionVersion)
     {
         throw new NotImplementedException();
     }

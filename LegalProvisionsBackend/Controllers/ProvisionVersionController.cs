@@ -5,39 +5,45 @@ using Microsoft.AspNetCore.Mvc;
 namespace LegalProvisionsBackend.Controllers;
 
 [Route("[controller]/[action]")]
-public class ProvisionsController : Controller
+public class ProvisionVersionController : Controller
 {
-    private readonly IDataPersistence _dataPersistence;
+    private readonly MongoPersistence _dataPersistence;
 
-    public ProvisionsController(IDataPersistence dataPersistence)
+    public ProvisionVersionController(MongoPersistence dataPersistence)
     {
         _dataPersistence = dataPersistence;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<LegalProvision>> GetAll()
+    public async Task<IEnumerable<ProvisionVersion>> GetAll()
     {
         return await _dataPersistence.GetAllProvisionsAsync();
     }
     
     [HttpGet("{id:guid}")]
-    public async Task<LegalProvision> GetOne(Guid id)
+    public async Task<ProvisionVersion> GetOne(Guid id)
     {
         return await _dataPersistence.GetProvisionAsync(id);
     }
-    
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] LegalProvisionFields provisionFields)
+
+    [HttpGet("{id:guid}")]
+    public async Task<IEnumerable<ProvisionVersion>> GetByHeaderId(Guid id)
     {
-        var objectId = await _dataPersistence.AddProvisionAsync(provisionFields);
+        return await _dataPersistence.GetVersionsByHeaderIdAsync(id);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] ProvisionVersionFields provisionVersionFields)
+    {
+        var objectId = await _dataPersistence.AddProvisionAsync(provisionVersionFields);
         
         return Ok(objectId);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] LegalProvisionFields provisionFields)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ProvisionVersionFields provisionVersionFields)
     {
-        await _dataPersistence.UpdateProvisionAsync(id, provisionFields);
+        await _dataPersistence.UpdateProvisionAsync(id, provisionVersionFields);
 
         return Ok();
     }

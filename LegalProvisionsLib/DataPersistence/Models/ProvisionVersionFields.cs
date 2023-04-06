@@ -2,13 +2,10 @@
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
-public class LegalProvisionFields
+public class ProvisionVersionFields
 {
-    [BsonElement(elementName: "title")]
-    public string? Title { get; set; }
-    
-    [BsonElement(elementName: "key_words")]
-    public IEnumerable<string>? KeyWords { get; set; }
+    [BsonElement(elementName: "provision_header")]
+    public Guid ProvisionHeader { get; set; }
 
     [BsonElement(elementName: "issue_time")]
     public DateTime? IssueTime { get; set; }
