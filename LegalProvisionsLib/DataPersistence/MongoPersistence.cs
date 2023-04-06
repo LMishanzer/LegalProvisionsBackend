@@ -37,6 +37,19 @@ public class MongoPersistence : IDataPersistence
         };
     }
 
+    public async Task<ProvisionVersion> GetActualVersionAsync(Guid headerId)
+    {
+        var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId);
+        var sort = Builders<ProvisionVersion>.Sort.Descending(version => version.Fields.TakesEffectFrom);
+
+        var provisionVersionList = await _provisionCollection.Find(filter).Sort(sort).Limit(1).ToListAsync();
+
+        if (provisionVersionList.Count != 1)
+            throw new ElementsCountException("");
+
+        return provisionVersionList.First();
+    }
+
     public async Task<IEnumerable<ProvisionVersion>> GetVersionsByHeaderIdAsync(Guid headerId)
     {
         var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId);

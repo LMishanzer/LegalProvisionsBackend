@@ -32,6 +32,12 @@ public class ProvisionVersionController : Controller
         return await _dataPersistence.GetVersionsByHeaderIdAsync(id);
     }
 
+    [HttpGet("{headerId:guid}")]
+    public async Task<ProvisionVersion> GetActualProvisionVersion(Guid headerId)
+    {
+        return await _dataPersistence.GetActualVersionAsync(headerId);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ProvisionVersionFields provisionVersionFields)
     {
