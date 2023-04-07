@@ -40,9 +40,22 @@ public class MongoPersistence : IDataPersistence
     public async Task<ProvisionVersion> GetActualVersionAsync(Guid headerId)
     {
         var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId);
-        var sort = Builders<ProvisionVersion>.Sort.Descending(version => version.Fields.TakesEffectFrom);
+        var sort = Builders<ProvisionVersion>.Sort.Descending(version => version.Fields.IssueDate);
 
         var provisionVersionList = await _provisionCollection.Find(filter).Sort(sort).Limit(1).ToListAsync();
+
+        if (provisionVersionList.Count != 1)
+            throw new ElementsCountException("");
+
+        return provisionVersionList.First();
+    }
+    
+    public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid headerId, DateOnly issueDate)
+    {
+        var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId)
+            & Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.IssueDate, issueDate);
+
+        var provisionVersionList = await _provisionCollection.Find(filter).Limit(1).ToListAsync();
 
         if (provisionVersionList.Count != 1)
             throw new ElementsCountException("");
@@ -70,20 +83,13 @@ public class MongoPersistence : IDataPersistence
         var provision = await GetProvisionAsync(id);
         provision.Fields = newProvisionVersionFields;
 
-        var updateResult = await _provisionCollection.ReplaceOneAsync(GetFilterById(id), provision);
-
-        if (updateResult.ModifiedCount > 1)
-            throw new NotImplementedException();
+        await _provisionCollection.ReplaceOneAsync(GetFilterById(id), provision);
     }
 
     public async Task DeleteProvisionAsync(Guid id)
     {
         await GetProvisionAsync(id);
-
-        var deleteResult = await _provisionCollection.DeleteOneAsync(GetFilterById(id));
-        
-        if (deleteResult.DeletedCount > 1)
-            throw new NotImplementedException();
+        await _provisionCollection.DeleteOneAsync(GetFilterById(id));
     }
 
     public async Task DeleteAllProvisionsAsync() => await _provisionCollection.DeleteManyAsync(new BsonDocument());
@@ -119,6 +125,26 @@ public class MongoPersistence : IDataPersistence
         await provisionHeadersCollection.InsertOneAsync(provisionHeader);
 
         return provisionHeader.Id;
+    }
+
+    public async Task AddDateToProvisionHeaderAsync(Guid id, DateOnly date)
+    {
+        var collection = GetProvisionHeadersCollection();
+        
+        var filter = GetFilterById(id);
+        var update = Builders<ProvisionHeader>.Update.Push(field => field.Fields.DatesOfChange, date);
+
+        await collection.UpdateOneAsync(filter, update);
+    }
+
+    public async Task UpdateProvisionHeaderAsync(Guid id, ProvisionHeaderFields newHeaderFields)
+    {
+        var collection = GetProvisionHeadersCollection();
+        var oldHeader = await GetProvisionHeaderAsync(id);
+
+        oldHeader.Fields = newHeaderFields;
+
+        await collection.ReplaceOneAsync(GetFilterById(id), oldHeader);
     }
     
     private IMongoCollection<ProvisionHeader> GetProvisionHeadersCollection() => _mongoDatabase.GetCollection<ProvisionHeader>("ProvisionHeaders");

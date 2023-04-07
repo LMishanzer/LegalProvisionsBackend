@@ -10,5 +10,5 @@ public class ProvisionHeaderFields
     [BsonElement(elementName: "keywords")]
     public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();
 
-    public IEnumerable<DateOnly> DatesOfChange { get; set; } = Array.Empty<DateOnly>();
+    public List<DateOnly> DatesOfChange { get; set; } = new();
 }
