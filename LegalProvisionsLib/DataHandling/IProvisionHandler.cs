@@ -1,4 +1,5 @@
-﻿using LegalProvisionsLib.DataPersistence.Models;
+﻿using LegalProvisionsLib.DataHandling.Models;
+using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences.Models;
 
 namespace LegalProvisionsLib.DataHandling;
@@ -12,4 +13,5 @@ public interface IProvisionHandler
     Task<ProvisionVersion> GetActualProvisionVersion(Guid id);
     Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate);
     Task<ProvisionDifference> GetVersionDifferences(Guid original, Guid changed);
+    Task<ProvisionDifference> GetVersionDifferences(DifferenceRequest differenceRequest);
 }

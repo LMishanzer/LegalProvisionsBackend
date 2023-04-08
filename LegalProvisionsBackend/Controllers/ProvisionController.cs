@@ -1,4 +1,5 @@
 ﻿using LegalProvisionsLib.DataHandling;
+using LegalProvisionsLib.DataHandling.Models;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -55,5 +56,11 @@ public class ProvisionController : Controller
     public async Task<ProvisionDifference> GetDifferences(Guid originalId, Guid changedId)
     {
         return await _provisionHandler.GetVersionDifferences(originalId, changedId);
+    }
+
+    [HttpPost]
+    public async Task<ProvisionDifference> GetDifferences([FromBody] DifferenceRequest differenceRequest)
+    {
+        return await _provisionHandler.GetVersionDifferences(differenceRequest);
     }
 }

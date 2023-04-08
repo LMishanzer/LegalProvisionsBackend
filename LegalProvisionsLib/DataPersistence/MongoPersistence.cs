@@ -127,16 +127,6 @@ public class MongoPersistence : IDataPersistence
         return provisionHeader.Id;
     }
 
-    public async Task AddDateToProvisionHeaderAsync(Guid id, DateOnly date)
-    {
-        var collection = GetProvisionHeadersCollection();
-        
-        var filter = GetFilterById(id);
-        var update = Builders<ProvisionHeader>.Update.Push(field => field.Fields.DatesOfChange, date);
-
-        await collection.UpdateOneAsync(filter, update);
-    }
-
     public async Task UpdateProvisionHeaderAsync(Guid id, ProvisionHeaderFields newHeaderFields)
     {
         var collection = GetProvisionHeadersCollection();

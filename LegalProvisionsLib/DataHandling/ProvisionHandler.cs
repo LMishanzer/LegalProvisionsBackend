@@ -1,9 +1,11 @@
-﻿using LegalProvisionsLib.DataPersistence;
+﻿using LegalProvisionsLib.DataHandling.Models;
+using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.DataPersistence.Exceptions;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.Models;
 using LegalProvisionsLib.Exceptions;
+using LegalProvisionsLib.Helpers;
 
 namespace LegalProvisionsLib.DataHandling;
 
@@ -27,10 +29,12 @@ public class ProvisionHandler : IProvisionHandler
     {
         var headerId = versionFields.ProvisionHeader;
 
+        ProvisionHeader header;
+
         // check existence
         try
         {
-            await _mongoPersistence.GetProvisionHeaderAsync(headerId);
+            header = await _mongoPersistence.GetProvisionHeaderAsync(headerId);
         }
         catch(ElementsCountException e)
         {
@@ -38,7 +42,10 @@ public class ProvisionHandler : IProvisionHandler
         }
         
         var resultId = await _mongoPersistence.AddProvisionAsync(versionFields);
-        await _mongoPersistence.AddDateToProvisionHeaderAsync(headerId, versionFields.IssueDate);
+        header.Fields.DatesOfChange.Add(versionFields.IssueDate);
+        header.Fields.DatesOfChange = header.Fields.DatesOfChange.Order().ToList();
+
+        await _mongoPersistence.UpdateProvisionHeaderAsync(headerId, header.Fields);
 
         return resultId;
     }
@@ -55,7 +62,7 @@ public class ProvisionHandler : IProvisionHandler
     
     public async Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate)
     {
-        var issueDay = new DateOnly(issueDate.Year, issueDate.Month, issueDate.Day);
+        var issueDay = DateHelper.DateTimeToDate(issueDate);
         return await _mongoPersistence.GetProvisionVersionAsync(id, issueDay);
     }
 
@@ -77,5 +84,16 @@ public class ProvisionHandler : IProvisionHandler
         var changed = await _mongoPersistence.GetProvisionAsync(changedVersionId);
 
         return _differenceCalculator.CalculateDifferences(original, changed);
+    }
+
+    public async Task<ProvisionDifference> GetVersionDifferences(DifferenceRequest differenceRequest)
+    {
+        var firstDate = DateHelper.DateTimeToDate(differenceRequest.FirstProvisionIssue);
+        var secondDate = DateHelper.DateTimeToDate(differenceRequest.SecondProvisionIssue);
+
+        var firstProvision = await _mongoPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, firstDate);
+        var secondProvision = await _mongoPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, secondDate);
+
+        return _differenceCalculator.CalculateDifferences(firstProvision, secondProvision);
     }
 }
