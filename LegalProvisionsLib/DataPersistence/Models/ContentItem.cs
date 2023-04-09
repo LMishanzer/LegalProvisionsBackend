@@ -6,6 +6,9 @@ public class ContentItem
 {
     [BsonElement(elementName: "id")]
     public Guid Id { get; set; } = Guid.NewGuid();
+
+    [BsonElement(elementName: "identifier")]
+    public string Identifier { get; set; } = string.Empty;
     
     [BsonElement(elementName: "title")]
     public string Title { get; set; } = string.Empty;
