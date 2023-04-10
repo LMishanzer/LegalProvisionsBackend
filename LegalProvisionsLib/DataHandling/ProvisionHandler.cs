@@ -11,21 +11,23 @@ namespace LegalProvisionsLib.DataHandling;
 
 public class ProvisionHandler : IProvisionHandler
 {
-    private readonly MongoPersistence _mongoPersistence;
+    private readonly ProvisionVersionPersistence _provisionVersionPersistence;
+    private readonly ProvisionHeaderPersistence _provisionHeaderPersistence;
     private readonly IDifferenceCalculator _differenceCalculator;
 
-    public ProvisionHandler(MongoPersistence mongoPersistence, IDifferenceCalculator differenceCalculator)
+    public ProvisionHandler(ProvisionVersionPersistence provisionVersionPersistence, IDifferenceCalculator differenceCalculator, ProvisionHeaderPersistence provisionHeaderPersistence)
     {
-        _mongoPersistence = mongoPersistence;
+        _provisionVersionPersistence = provisionVersionPersistence;
         _differenceCalculator = differenceCalculator;
+        _provisionHeaderPersistence = provisionHeaderPersistence;
     }
     
-    public async Task<Guid> AddProvision(ProvisionHeaderFields headerFields)
+    public async Task<Guid> AddProvisionAsync(ProvisionHeaderFields headerFields)
     {
-        return await _mongoPersistence.AddProvisionHeaderAsync(headerFields);
+        return await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
     }
 
-    public async Task<Guid> AddProvisionVersion(ProvisionVersionFields versionFields)
+    public async Task<Guid> AddProvisionVersionAsync(ProvisionVersionFields versionFields)
     {
         var headerId = versionFields.ProvisionHeader;
 
@@ -34,43 +36,48 @@ public class ProvisionHandler : IProvisionHandler
         // check existence
         try
         {
-            header = await _mongoPersistence.GetProvisionHeaderAsync(headerId);
+            header = await _provisionHeaderPersistence.GetProvisionHeaderAsync(headerId);
         }
         catch(ElementsCountException e)
         {
             throw new ClientSideException("No such provision header", e);
         }
         
-        var resultId = await _mongoPersistence.AddProvisionAsync(versionFields);
+        var resultId = await _provisionVersionPersistence.AddProvisionAsync(versionFields);
         header.Fields.DatesOfChange.Add(versionFields.IssueDate);
         header.Fields.DatesOfChange = header.Fields.DatesOfChange.Order().ToList();
 
-        await _mongoPersistence.UpdateProvisionHeaderAsync(headerId, header.Fields);
+        await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(headerId, header.Fields);
 
         return resultId;
     }
 
-    public async Task<IEnumerable<ProvisionHeader>> GetAllProvisions()
+    public async Task<IEnumerable<ProvisionHeader>> GetAllProvisionsAsync()
     {
-        return await _mongoPersistence.GetAllProvisionHeadersAsync();
+        return await _provisionHeaderPersistence.GetAllProvisionHeadersAsync();
     }
 
-    public async Task<ProvisionHeader> GetProvisionHeader(Guid id)
+    public async Task<ProvisionHeader> GetProvisionHeaderAsync(Guid id)
     {
-        return await _mongoPersistence.GetProvisionHeaderAsync(id);
+        return await _provisionHeaderPersistence.GetProvisionHeaderAsync(id);
     }
     
-    public async Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate)
+    public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid id, DateTime issueDate)
     {
         var issueDay = DateHelper.DateTimeToDate(issueDate);
-        return await _mongoPersistence.GetProvisionVersionAsync(id, issueDay);
+        return await _provisionVersionPersistence.GetProvisionVersionAsync(id, issueDay);
+    }
+    
+    public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid versionId)
+    {
+        return await _provisionVersionPersistence.GetProvisionAsync(versionId);
     }
 
-    public async Task<ProvisionVersion> GetActualProvisionVersion(Guid headerId)
+    public async Task<ProvisionVersion> GetActualProvisionVersionAsync(Guid headerId)
     {
         try
         {
-            return await _mongoPersistence.GetActualVersionAsync(headerId);
+            return await _provisionVersionPersistence.GetActualVersionAsync(headerId);
         }
         catch (ElementsCountException e)
         {
@@ -78,22 +85,43 @@ public class ProvisionHandler : IProvisionHandler
         }
     }
 
-    public async Task<ProvisionDifference> GetVersionDifferences(Guid originalVersionId, Guid changedVersionId)
+    public async Task<ProvisionDifference> GetVersionDifferencesAsync(Guid originalVersionId, Guid changedVersionId)
     {
-        var original = await _mongoPersistence.GetProvisionAsync(originalVersionId);
-        var changed = await _mongoPersistence.GetProvisionAsync(changedVersionId);
+        var original = await _provisionVersionPersistence.GetProvisionAsync(originalVersionId);
+        var changed = await _provisionVersionPersistence.GetProvisionAsync(changedVersionId);
 
         return _differenceCalculator.CalculateDifferences(original, changed);
     }
 
-    public async Task<ProvisionDifference> GetVersionDifferences(DifferenceRequest differenceRequest)
+    public async Task<ProvisionDifference> GetVersionDifferencesAsync(DifferenceRequest differenceRequest)
     {
         var firstDate = DateHelper.DateTimeToDate(differenceRequest.FirstProvisionIssue);
         var secondDate = DateHelper.DateTimeToDate(differenceRequest.SecondProvisionIssue);
 
-        var firstProvision = await _mongoPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, firstDate);
-        var secondProvision = await _mongoPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, secondDate);
+        var firstProvision = await _provisionVersionPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, firstDate);
+        var secondProvision = await _provisionVersionPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, secondDate);
 
         return _differenceCalculator.CalculateDifferences(firstProvision, secondProvision);
+    }
+
+    public async Task UpdateVersionAsync(Guid versionId, ProvisionVersionFields versionFields)
+    {
+        await _provisionVersionPersistence.UpdateVersionAsync(versionId, versionFields);
+    }
+
+    public async Task DeleteProvisionAsync(Guid headerId)
+    {
+        await _provisionVersionPersistence.DeleteVersionsByHeaderAsync(headerId);
+        await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(headerId);
+    }
+
+    public async Task DeleteProvisionVersionAsync(Guid versionId)
+    {
+        var version = await _provisionVersionPersistence.GetProvisionAsync(versionId);
+        var header = await _provisionHeaderPersistence.GetProvisionHeaderAsync(version.Fields.ProvisionHeader);
+        var issueDate = version.Fields.IssueDate;
+        header.Fields.DatesOfChange.Remove(issueDate);
+        await _provisionVersionPersistence.DeleteProvisionAsync(versionId);
+        await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(header.Id, header.Fields);
     }
 }

@@ -17,7 +17,7 @@ public class ContentItem
     public string TextMain { get; set; } = string.Empty;
     
     [BsonElement(elementName: "inner_items_type")]
-    public string InnerItemsType { get; set; } = string.Empty;
+    public string? InnerItemsType { get; set; } = string.Empty;
     
     [BsonElement(elementName: "inner_items")]
     public IEnumerable<ContentItem> InnerItems { get; set; } = Array.Empty<ContentItem>();

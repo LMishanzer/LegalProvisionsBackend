@@ -11,10 +11,10 @@ public class ProvisionVersionFields
     public DateOnly IssueDate { get; set; }
 
     [BsonElement(elementName: "valid_from")]
-    public DateOnly ValidFrom { get; set; }
+    public DateOnly? ValidFrom { get; set; }
 
     [BsonElement("takes_effect_from")]
-    public DateOnly TakesEffectFrom { get; set; }
+    public DateOnly? TakesEffectFrom { get; set; }
 
     [BsonElement(elementName: "content")]
     public ContentItem? Content { get; set; }

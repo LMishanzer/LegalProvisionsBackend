@@ -19,48 +19,73 @@ public class ProvisionController : Controller
     [HttpGet]
     public async Task<IEnumerable<ProvisionHeader>> GetAll()
     {
-        return await _provisionHandler.GetAllProvisions();
+        return await _provisionHandler.GetAllProvisionsAsync();
     }
     
     [HttpGet("{id:guid}")]
     public async Task<ProvisionVersion> GetActualVersion(Guid id)
     {
-        return await _provisionHandler.GetActualProvisionVersion(id);
+        return await _provisionHandler.GetActualProvisionVersionAsync(id);
     }
     
     [HttpGet("{id:guid}")]
     public async Task<ProvisionHeader> GetProvisionHeader(Guid id)
     {
-        return await _provisionHandler.GetProvisionHeader(id);
+        return await _provisionHandler.GetProvisionHeaderAsync(id);
     }
     
     [HttpGet("{id:guid}/{issueDate:datetime}")]
     public async Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate)
     {
-        return await _provisionHandler.GetProvisionVersion(id, issueDate);
+        return await _provisionHandler.GetProvisionVersionAsync(id, issueDate);
+    }
+    
+    [HttpGet("{versionId:guid}")]
+    public async Task<ProvisionVersion> GetProvisionVersion(Guid versionId)
+    {
+        return await _provisionHandler.GetProvisionVersionAsync(versionId);
     }
 
     [HttpPost]
     public async Task<Guid> AddProvision([FromBody] ProvisionHeaderFields headerFields)
     {
-        return await _provisionHandler.AddProvision(headerFields);
+        return await _provisionHandler.AddProvisionAsync(headerFields);
     }
     
     [HttpPost]
-    public async Task<Guid> AddProvisionVersion([FromBody] ProvisionVersionFields headerFields)
+    [Consumes("application/json")]
+    public async Task<Guid> AddProvisionVersion([FromBody] ProvisionVersionFields versionFields)
     {
-        return await _provisionHandler.AddProvisionVersion(headerFields);
+        return await _provisionHandler.AddProvisionVersionAsync(versionFields);
     }
 
     [HttpGet("{originalId:guid}/{changedId:guid}")]
     public async Task<ProvisionDifference> GetDifferences(Guid originalId, Guid changedId)
     {
-        return await _provisionHandler.GetVersionDifferences(originalId, changedId);
+        return await _provisionHandler.GetVersionDifferencesAsync(originalId, changedId);
     }
 
     [HttpPost]
     public async Task<ProvisionDifference> GetDifferences([FromBody] DifferenceRequest differenceRequest)
     {
-        return await _provisionHandler.GetVersionDifferences(differenceRequest);
+        return await _provisionHandler.GetVersionDifferencesAsync(differenceRequest);
+    }
+
+    [HttpPut("{versionId:guid}")]
+    public async Task UpdateVersion(Guid versionId, [FromBody] ProvisionVersionFields versionFields)
+    {
+        await _provisionHandler.UpdateVersionAsync(versionId, versionFields);
+    }
+
+    [HttpDelete("{headerId:guid}")]
+    public async Task DeleteProvision(Guid headerId)
+    {
+        await _provisionHandler.DeleteProvisionAsync(headerId);
+    }
+
+    [HttpDelete("{versionId:guid}")]
+    public async Task DeleteProvisionVersion(Guid versionId)
+    {
+        await _provisionHandler.DeleteProvisionVersionAsync(versionId);
     }
 }

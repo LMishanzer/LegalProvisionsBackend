@@ -2,5 +2,5 @@
 
 public class ServerSettings
 {
-    public MongoSettings MongoSettings { get; set; }
+    public MongoSettings MongoSettings { get; set; } = new();
 }
