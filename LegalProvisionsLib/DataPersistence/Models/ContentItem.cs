@@ -22,6 +22,9 @@ public class ContentItem
     [BsonElement(elementName: "inner_items")]
     public IEnumerable<ContentItem> InnerItems { get; set; } = Array.Empty<ContentItem>();
 
+    [BsonElement(elementName: "references")]
+    public IEnumerable<Reference> References { get; set; } = Array.Empty<Reference>();
+
     public IEnumerable<ContentItem> GetAllContentInArray()
     {
         var list = new List<ContentItem>();

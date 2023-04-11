@@ -13,7 +13,7 @@ public class ProvisionVersionFields
     [BsonElement(elementName: "valid_from")]
     public DateOnly? ValidFrom { get; set; }
 
-    [BsonElement("takes_effect_from")]
+    [BsonElement(elementName: "takes_effect_from")]
     public DateOnly? TakesEffectFrom { get; set; }
 
     [BsonElement(elementName: "content")]
