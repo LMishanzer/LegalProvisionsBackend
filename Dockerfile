@@ -6,7 +6,9 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["LegalProvisionsBackend/LegalProvisionsBackend.csproj", "LegalProvisionsBackend/"]
+COPY ["LegalProvisionsLib/LegalProvisionsLib.csproj", "LegalProvisionsLib/"]
 RUN dotnet restore "LegalProvisionsBackend/LegalProvisionsBackend.csproj"
+RUN dotnet restore "LegalProvisionsLib/LegalProvisionsLib.csproj"
 COPY . .
 WORKDIR "/src/LegalProvisionsBackend"
 RUN dotnet build "LegalProvisionsBackend.csproj" -c Release -o /app/build
