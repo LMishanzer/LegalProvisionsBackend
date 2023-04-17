@@ -8,9 +8,9 @@ build:
   services:
     - docker:dind
   script:
-    - docker build -t my-container-image .
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $CI_REGISTRY_IMAGE/my-container-image
+    - docker build -t legal-provisions-backend .
+    # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # - docker push $CI_REGISTRY_IMAGE/my-container-image
 
 test:
   stage: test
