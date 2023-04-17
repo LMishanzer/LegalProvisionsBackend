@@ -11,8 +11,6 @@ namespace LegalProvisionsBackend;
 
 public class Startup
 {
-    private const string CorsPolicy = "AllowSpecificOrigins";
-
     public void ConfigureServices(IServiceCollection services)
     {
         var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
@@ -30,20 +28,23 @@ public class Startup
         services.AddTransient<ISearchHandler, SearchHandler>();
         
         services.AddControllers();
-        services.AddCors(options =>
-        {
-            options.AddPolicy(name: CorsPolicy,
-                policy  =>
-                {
-                    policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
-                });
-        });
     }
     
-    public void Configure(WebApplication app)
+    public void Configure(WebApplication app, IWebHostEnvironment env)
     {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        
         app.UseMiddleware<ExceptionHandler>();
-        app.UseCors(CorsPolicy);
+        
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        
+        app.UseRouting();
+        app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+        app.UseAuthorization();
         app.MapControllers();
     }
 }
