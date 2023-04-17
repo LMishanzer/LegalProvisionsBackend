@@ -1,7 +1,11 @@
 ﻿{
 	"MongoSettings": {
-		"ConnectionUri": "mongodb://root:StrongPassword2023!@localhost:27017/?authMechanism=SCRAM-SHA-256",
+		"ConnectionUri": "mongodb://root:StrongPassword2023!@95.179.243.24:27017/?authMechanism=SCRAM-SHA-256",
 		"DatabaseName": "LegalProvisions",
 		"CollectionName": "LegalProvisions"
+	},
+	"ElasticSettings": {
+		"Url": "http://95.179.243.24:9200",
+		"DefaultIndex": "provisions"
 	}
 }

@@ -2,6 +2,8 @@
 using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
+using LegalProvisionsLib.Search;
+using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
 
@@ -13,16 +15,19 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var settings = new SettingsReader().ReadSettings($"Settings\\server.settings.json");
+        var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
         var client = new MongoClient(settings.MongoSettings.ConnectionUri);
         var database = client.GetDatabase(settings.MongoSettings.DatabaseName);
 
-        services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
+        services.AddTransient<MongoSettings>(_ => settings.MongoSettings);
+        services.AddTransient<ElasticSettings>(_ => settings.ElasticSettings);
         services.AddTransient<ProvisionVersionPersistence>();
         services.AddTransient<ProvisionHeaderPersistence>();
         services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
         services.AddTransient<IProvisionHandler, ProvisionHandler>();
-        services.AddSingleton<IMongoDatabase>(_ => database);
+        services.AddTransient<IMongoDatabase>(_ => database);
+        services.AddTransient<IIndexer, ElasticsearchIndexer>();
+        services.AddTransient<ISearchHandler, SearchHandler>();
         
         services.AddControllers();
         services.AddCors(options =>

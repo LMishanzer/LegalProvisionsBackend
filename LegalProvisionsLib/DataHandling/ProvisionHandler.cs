@@ -6,6 +6,7 @@ using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.Helpers;
+using LegalProvisionsLib.Search.Indexing;
 
 namespace LegalProvisionsLib.DataHandling;
 
@@ -13,18 +14,35 @@ public class ProvisionHandler : IProvisionHandler
 {
     private readonly ProvisionVersionPersistence _provisionVersionPersistence;
     private readonly ProvisionHeaderPersistence _provisionHeaderPersistence;
+    private readonly IIndexer _indexer;
     private readonly IDifferenceCalculator _differenceCalculator;
 
-    public ProvisionHandler(ProvisionVersionPersistence provisionVersionPersistence, IDifferenceCalculator differenceCalculator, ProvisionHeaderPersistence provisionHeaderPersistence)
+    public ProvisionHandler(
+        ProvisionVersionPersistence provisionVersionPersistence, 
+        IDifferenceCalculator differenceCalculator, 
+        ProvisionHeaderPersistence provisionHeaderPersistence,
+        IIndexer indexer)
     {
         _provisionVersionPersistence = provisionVersionPersistence;
         _differenceCalculator = differenceCalculator;
         _provisionHeaderPersistence = provisionHeaderPersistence;
+        _indexer = indexer;
     }
     
     public async Task<Guid> AddProvisionAsync(ProvisionHeaderFields headerFields)
     {
-        return await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
+        var id = await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
+
+        foreach (var keyword in headerFields.Keywords)
+        {
+            await _indexer.IndexRecordAsync(new IndexRecord
+            {
+                Keyword = keyword,
+                ProvisionId = id
+            });
+        }
+
+        return id;
     }
 
     public async Task<Guid> AddProvisionVersionAsync(ProvisionVersionFields versionFields)
@@ -113,6 +131,18 @@ public class ProvisionHandler : IProvisionHandler
     {
         await _provisionVersionPersistence.DeleteVersionsByHeaderAsync(headerId);
         await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(headerId);
+        
+        // var documents = await _indexer.GetByRequestAsync(new QueryModel
+        // {
+        //     ProvisionId = headerId
+        // });
+        //
+        // foreach (var document in documents)
+        // {
+        //     await _indexer.DeleteRecordAsync(headerId);
+        // }
+        
+        await _indexer.DeleteRecordAsync(headerId);
     }
 
     public async Task DeleteProvisionVersionAsync(Guid versionId)
