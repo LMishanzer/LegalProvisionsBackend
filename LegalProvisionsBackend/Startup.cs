@@ -37,14 +37,22 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
         
+        app.UseFileServer();
+        
         app.UseMiddleware<ExceptionHandler>();
-        
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        
+
         app.UseRouting();
-        app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+        app.UseCors(builder => builder.WithOrigins("http://localhost:4200", "http://95.179.243.24"));
         app.UseAuthorization();
         app.MapControllers();
+
+        app.MapGet("/{**catchall}", async context =>
+        {
+            context.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+            context.Response.Headers.Add("Pragma", "no-cache");
+            context.Response.Headers.Add("Expires", "0");
+
+            await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
+        });
     }
 }

@@ -21,4 +21,8 @@
       <ProjectReference Include="..\LegalProvisionsLib\LegalProvisionsLib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot" />
+    </ItemGroup>
+
 </Project>
