@@ -38,7 +38,7 @@ public class Startup
     public void Configure(WebApplication app)
     {
         app.UseMiddleware<ExceptionHandler>();
-        app.MapControllers();
         app.UseCors(CorsPolicy);
+        app.MapControllers();
     }
 }
