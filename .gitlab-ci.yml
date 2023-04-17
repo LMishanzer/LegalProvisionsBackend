@@ -4,8 +4,13 @@ stages:
 
 build:
   stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Building the application"
+    - docker build -t my-container-image .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/my-container-image
 
 test:
   stage: test
