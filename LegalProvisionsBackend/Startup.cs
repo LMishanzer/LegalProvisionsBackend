@@ -11,6 +11,8 @@ namespace LegalProvisionsBackend;
 
 public class Startup
 {
+    private const string CorsPolicy = "AllowSpecificOrigins";
+    
     public void ConfigureServices(IServiceCollection services)
     {
         var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
@@ -28,6 +30,17 @@ public class Startup
         services.AddTransient<ISearchHandler, SearchHandler>();
         
         services.AddControllers();
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy(name: CorsPolicy,
+                policy  =>
+                {
+                    policy.WithOrigins("*")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+        });
     }
     
     public void Configure(WebApplication app, IWebHostEnvironment env)
@@ -42,17 +55,13 @@ public class Startup
         app.UseMiddleware<ExceptionHandler>();
 
         app.UseRouting();
-        app.UseCors(builder => builder.WithOrigins("http://localhost:4200", "http://95.179.243.24"));
+        app.UseCors(CorsPolicy);
         app.UseAuthorization();
-        app.MapControllers();
 
-        app.MapGet("/{**catchall}", async context =>
-        {
-            context.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-            context.Response.Headers.Add("Pragma", "no-cache");
-            context.Response.Headers.Add("Expires", "0");
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller}/{action}");
 
-            await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
-        });
+        app.MapFallbackToFile("index.html");
     }
 }
