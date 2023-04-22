@@ -29,6 +29,15 @@ public class ProvisionHeaderPersistence : DataPersistence
         return foundHeaders.First();
     }
     
+    public async Task<IEnumerable<ProvisionHeader>> GetProvisionHeadersAsync(IEnumerable<Guid> headerIds)
+    {
+        var filter = Builders<ProvisionHeader>.Filter.In(p => p.Id, headerIds);
+        var foundHeaders = await _headerCollection.Find(filter).ToListAsync() 
+                           ?? (IEnumerable<ProvisionHeader>) Array.Empty<ProvisionHeader>();
+
+        return foundHeaders;
+    }
+    
     public async Task<Guid> AddProvisionHeaderAsync(ProvisionHeaderFields fields)
     {
         var provisionHeader = new ProvisionHeader(fields);

@@ -34,6 +34,12 @@ public class ProvisionController : Controller
         return await _provisionHandler.GetProvisionHeaderAsync(id);
     }
     
+    [HttpPost]
+    public async Task<IEnumerable<ProvisionHeader>> GetProvisionHeaders([FromBody] ProvisionHeadersRequest request)
+    {
+        return await _provisionHandler.GetProvisionHeadersAsync(request);
+    }
+    
     [HttpGet("{id:guid}/{issueDate:datetime}")]
     public async Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate)
     {

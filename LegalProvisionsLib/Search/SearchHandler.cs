@@ -34,7 +34,7 @@ public class SearchHandler : ISearchHandler
 
         provisionList.AddRange(taskList.Where(task => task.Result != null).Select(task => task.Result!));
 
-        return provisionList;
+        return provisionList.DistinctBy(p => p.Id);
     }
 
     private async Task<ProvisionHeader?> GetHeaderSafeAsync(Guid provisionId)

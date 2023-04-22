@@ -33,6 +33,12 @@ public class ProvisionHandler : IProvisionHandler
     {
         var id = await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
 
+        await _indexer.IndexRecordAsync(new IndexRecord
+        {
+            Keyword = headerFields.Title,
+            ProvisionId = id
+        });
+
         foreach (var keyword in headerFields.Keywords)
         {
             await _indexer.IndexRecordAsync(new IndexRecord
@@ -79,7 +85,12 @@ public class ProvisionHandler : IProvisionHandler
     {
         return await _provisionHeaderPersistence.GetProvisionHeaderAsync(id);
     }
-    
+
+    public async Task<IEnumerable<ProvisionHeader>> GetProvisionHeadersAsync(ProvisionHeadersRequest request)
+    {
+        return await _provisionHeaderPersistence.GetProvisionHeadersAsync(request.ProvisionIds);
+    }
+
     public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid id, DateTime issueDate)
     {
         var issueDay = DateHelper.DateTimeToDate(issueDate);
