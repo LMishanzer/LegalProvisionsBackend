@@ -1,6 +1,4 @@
-﻿using LegalProvisionsLib.Exceptions;
-
-namespace LegalProvisionsLib.DataPersistence.Exceptions;
+﻿namespace LegalProvisionsLib.Exceptions;
 
 public class ElementsCountException : ClientSideException
 {

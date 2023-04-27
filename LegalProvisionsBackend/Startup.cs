@@ -69,5 +69,6 @@ public class Startup
         services.AddTransient<IMongoDatabase>(_ => database);
         services.AddTransient<IIndexer, ElasticsearchIndexer>();
         services.AddTransient<ISearchHandler, SearchHandler>();
+        services.AddTransient<IFileStorage, FilesystemStorage>();
     }
 }

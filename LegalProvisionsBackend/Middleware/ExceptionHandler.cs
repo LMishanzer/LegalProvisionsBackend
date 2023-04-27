@@ -30,5 +30,9 @@ public class ExceptionHandler
             context.Response.StatusCode = 400;
             await context.Response.WriteAsync(clientSideException.Message);
         }
+        else
+        {
+            throw ex;
+        }
     }
 }
