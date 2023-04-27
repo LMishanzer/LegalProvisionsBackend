@@ -7,7 +7,7 @@ public abstract class DataPersistence
     protected static BsonDocument GetFilterById(Guid id)
     {
         return new BsonDocument(
-            new BsonElement("_id",  id)
+            new BsonElement("_id",  new BsonBinaryData(id, GuidRepresentation.Standard))
         );
     }
 }
