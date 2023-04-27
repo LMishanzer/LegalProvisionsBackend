@@ -1,6 +1,4 @@
-﻿using LegalProvisionsLib.FileStorage.Models;
-
-namespace LegalProvisionsLib.FileStorage;
+﻿namespace LegalProvisionsLib.FileStorage;
 
 public class FilesystemStorage : IFileStorage
 {
@@ -12,41 +10,37 @@ public class FilesystemStorage : IFileStorage
         _directory = GetDirectory();
     }
     
-    public async Task<FileToStoreInfo> AddFileAsync(FileToStore file)
+    public async Task<string> AddFileAsync(Stream fileContent)
     {
-        var fullFileName = Path.Combine(_directory.FullName, file.Name);
+        var newFileName = $"{Guid.NewGuid()}.pdf";
+        var fullFileName = Path.Combine(_directory.FullName, newFileName);
         var fileInfo = new FileInfo(fullFileName);
         await using var fileStream = fileInfo.Create();
-        await file.Content.CopyToAsync(fileStream);
+        await fileContent.CopyToAsync(fileStream);
 
-        return new FileToStoreInfo(file.Name);
+        return newFileName;
     }
     
-    public FileToStore GetFile(FileToStoreInfo fileInfo)
+    public Stream GetFile(string fileName)
     {
-        var fullFileName = Path.Combine(_directory.FullName, fileInfo.Name);
+        var fullFileName = Path.Combine(_directory.FullName, fileName);
         var fileInnerInfo = new FileInfo(fullFileName);
 
         if (!fileInnerInfo.Exists)
-            throw new FileNotFoundException($"File {fileInfo.Name} cannot be found.", fileInfo.Name);
+            throw new FileNotFoundException($"File {fileName} cannot be found.", fileName);
 
         var fileStream = fileInnerInfo.OpenRead();
 
-        return new FileToStore(fileInfo.Name, fileStream);
+        return fileStream;
     }
 
-    public Task<FileToStore> GetFileAsync(FileToStoreInfo fileInfo)
+    public void DeleteFile(string fileName)
     {
-        return Task.FromResult(GetFile(fileInfo));
-    }
-
-    public void DeleteFile(FileToStoreInfo fileInfo)
-    {
-        var fullFileName = Path.Combine(DirectoryPath, fileInfo.Name);
+        var fullFileName = Path.Combine(DirectoryPath, fileName);
         var fileInnerInfo = new FileInfo(fullFileName);
         
         if (!fileInnerInfo.Exists)
-            throw new FileNotFoundException($"File {fileInfo.Name} cannot be found.", fileInfo.Name);
+            throw new FileNotFoundException($"File {fileName} cannot be found.", fileName);
 
         fileInnerInfo.Delete();
     }

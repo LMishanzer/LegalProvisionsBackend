@@ -1,40 +1,45 @@
 ﻿using System.Net.Mime;
-using LegalProvisionsLib.FileStorage;
+using LegalProvisionsLib.Documents;
+using LegalProvisionsLib.Documents.Models;
 using LegalProvisionsLib.FileStorage.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LegalProvisionsBackend.Controllers;
 
-[Route("[controller]")]
+[Route("[controller]/{versionId:guid}")]
 public class FileController : Controller
 {
-    private readonly IFileStorage _fileStorage;
-    
-    public FileController(IFileStorage fileStorage)
+    private readonly IDocumentManager _documentManager;
+
+    public FileController(IDocumentManager documentManager)
     {
-        _fileStorage = fileStorage;
+        _documentManager = documentManager;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upload(IFormFile? file)
+    public async Task<IActionResult> Upload(Guid versionId, IFormFile? file)
     {
         if (file == null || file.Length == 0)
             return BadRequest();
 
         await using var fileStream = file.OpenReadStream();
-        await _fileStorage.AddFileAsync(new FileToStore(file.FileName, fileStream));
+        await _documentManager.AddProvisionDocumentAsync(new Document
+        (
+            versionId: versionId,
+            file: new FileToStore(file.FileName, fileStream)
+        ));
 
         return Ok();
     }
 
-    [HttpGet("{fileName}")]
-    public IActionResult Download(string fileName)
+    [HttpGet]
+    public async Task<IActionResult> Download(Guid versionId)
     {
         FileToStore file;
 
         try
         {
-            file = _fileStorage.GetFile(new FileToStoreInfo(fileName));
+            file = await _documentManager.GetProvisionDocumentAsync(versionId);
         }
         catch (FileNotFoundException e)
         {
@@ -49,20 +54,5 @@ public class FileController : Controller
         Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
 
         return File(file.Content, "application/pdf");
-    }
-
-    [HttpDelete("{fileName}")]
-    public IActionResult Delete(string fileName)
-    {
-        try
-        {
-            _fileStorage.DeleteFile(new FileToStoreInfo(fileName));
-        }
-        catch (FileNotFoundException e)
-        {
-            return BadRequest($"File {e.FileName} wasn't found.");
-        }
-
-        return Ok();
     }
 }

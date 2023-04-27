@@ -2,6 +2,7 @@
 using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
+using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
@@ -70,5 +71,6 @@ public class Startup
         services.AddTransient<IIndexer, ElasticsearchIndexer>();
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IFileStorage, FilesystemStorage>();
+        services.AddTransient<IDocumentManager, DocumentManager>();
     }
 }

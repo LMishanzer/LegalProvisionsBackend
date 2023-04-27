@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
@@ -15,6 +16,9 @@ public class ProvisionVersionFields
 
     [BsonElement(elementName: "takes_effect_from")]
     public DateOnly? TakesEffectFrom { get; set; }
+    
+    [BsonElement(elementName: "document_name")]
+    public FileMetadata? FileMetadata { get; set; }
 
     [BsonElement(elementName: "content")]
     public ContentItem? Content { get; set; }

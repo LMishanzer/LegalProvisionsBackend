@@ -4,6 +4,7 @@ using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.Models;
 using LegalProvisionsLib.Exceptions;
+using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Helpers;
 using LegalProvisionsLib.Search.Indexing;
 
@@ -14,18 +15,21 @@ public class ProvisionHandler : IProvisionHandler
     private readonly ProvisionVersionPersistence _provisionVersionPersistence;
     private readonly ProvisionHeaderPersistence _provisionHeaderPersistence;
     private readonly IIndexer _indexer;
+    private readonly IFileStorage _fileStorage;
     private readonly IDifferenceCalculator _differenceCalculator;
 
     public ProvisionHandler(
         ProvisionVersionPersistence provisionVersionPersistence, 
         IDifferenceCalculator differenceCalculator, 
         ProvisionHeaderPersistence provisionHeaderPersistence,
-        IIndexer indexer)
+        IIndexer indexer,
+        IFileStorage fileStorage)
     {
         _provisionVersionPersistence = provisionVersionPersistence;
         _differenceCalculator = differenceCalculator;
         _provisionHeaderPersistence = provisionHeaderPersistence;
         _indexer = indexer;
+        _fileStorage = fileStorage;
     }
     
     public async Task<Guid> AddProvisionAsync(ProvisionHeaderFields headerFields)
@@ -139,19 +143,15 @@ public class ProvisionHandler : IProvisionHandler
 
     public async Task DeleteProvisionAsync(Guid headerId)
     {
+        var versions = await _provisionVersionPersistence.GetVersionsByHeaderIdAsync(headerId);
+
+        var documents = versions
+            .Select(v => v.Fields.FileMetadata)
+            .Where(m => m is not null);
+        
         await _provisionVersionPersistence.DeleteVersionsByHeaderAsync(headerId);
         await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(headerId);
-        
-        // var documents = await _indexer.GetByRequestAsync(new QueryModel
-        // {
-        //     ProvisionId = headerId
-        // });
-        //
-        // foreach (var document in documents)
-        // {
-        //     await _indexer.DeleteRecordAsync(headerId);
-        // }
-        
+
         await _indexer.DeleteRecordAsync(headerId);
     }
 
@@ -163,5 +163,10 @@ public class ProvisionHandler : IProvisionHandler
         header.Fields.DatesOfChange.Remove(issueDate);
         await _provisionVersionPersistence.DeleteProvisionAsync(versionId);
         await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(header.Id, header.Fields);
+
+        if (version.Fields.FileMetadata is not null)
+        {
+            _fileStorage.DeleteFile(version.Fields.FileMetadata.NameInStorage);
+        }
     }
 }

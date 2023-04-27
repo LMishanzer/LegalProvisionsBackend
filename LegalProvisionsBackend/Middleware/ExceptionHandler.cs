@@ -1,4 +1,5 @@
-﻿using LegalProvisionsLib.Exceptions;
+﻿using System.Text;
+using LegalProvisionsLib.Exceptions;
 
 namespace LegalProvisionsBackend.Middleware;
 
@@ -23,16 +24,22 @@ public class ExceptionHandler
         }
     }
 
-    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
-        if (ex is ClientSideException clientSideException)
+        switch (ex)
         {
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsync(clientSideException.Message);
-        }
-        else
-        {
-            throw ex;
+            case ClientSideException clientSideException:
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync(clientSideException.Message);
+                break;
+            case BaseException baseException:
+                context.Response.StatusCode = (int) baseException.HttpStatusCode;
+                var buffer = Encoding.UTF8.GetBytes(baseException.Message);
+                var memStream = new MemoryStream(buffer);
+                context.Response.Body = memStream;
+                break;
+            default:
+                throw ex;
         }
     }
 }
