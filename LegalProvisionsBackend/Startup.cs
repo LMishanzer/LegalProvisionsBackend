@@ -2,6 +2,7 @@
 using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
+using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Settings;
@@ -15,19 +16,7 @@ public class Startup
     
     public void ConfigureServices(IServiceCollection services)
     {
-        var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
-        var client = new MongoClient(settings.MongoSettings.ConnectionUri);
-        var database = client.GetDatabase(settings.MongoSettings.DatabaseName);
-
-        services.AddTransient<MongoSettings>(_ => settings.MongoSettings);
-        services.AddTransient<ElasticSettings>(_ => settings.ElasticSettings);
-        services.AddTransient<ProvisionVersionPersistence>();
-        services.AddTransient<ProvisionHeaderPersistence>();
-        services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
-        services.AddTransient<IProvisionHandler, ProvisionHandler>();
-        services.AddTransient<IMongoDatabase>(_ => database);
-        services.AddTransient<IIndexer, ElasticsearchIndexer>();
-        services.AddTransient<ISearchHandler, SearchHandler>();
+        RegisterDependencies(services);
         
         services.AddControllers();
         
@@ -63,5 +52,22 @@ public class Startup
             pattern: "{controller}/{action}");
 
         app.MapFallbackToFile("index.html");
+    }
+
+    private static void RegisterDependencies(IServiceCollection services)
+    {
+        var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
+        var client = new MongoClient(settings.MongoSettings.ConnectionUri);
+        var database = client.GetDatabase(settings.MongoSettings.DatabaseName);
+
+        services.AddTransient<MongoSettings>(_ => settings.MongoSettings);
+        services.AddTransient<ElasticSettings>(_ => settings.ElasticSettings);
+        services.AddTransient<ProvisionVersionPersistence>();
+        services.AddTransient<ProvisionHeaderPersistence>();
+        services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
+        services.AddTransient<IProvisionHandler, ProvisionHandler>();
+        services.AddTransient<IMongoDatabase>(_ => database);
+        services.AddTransient<IIndexer, ElasticsearchIndexer>();
+        services.AddTransient<ISearchHandler, SearchHandler>();
     }
 }
