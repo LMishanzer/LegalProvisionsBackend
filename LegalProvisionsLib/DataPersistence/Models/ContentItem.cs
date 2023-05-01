@@ -1,8 +1,10 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Text;
+using LegalProvisionsLib.TextExtracting;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
-public class ContentItem
+public class ContentItem : ITextExtractable
 {
     [BsonElement(elementName: "id")]
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -43,5 +45,18 @@ public class ContentItem
     {
         // ReSharper disable once NonReadonlyMemberInGetHashCode
         return Id.GetHashCode();
+    }
+
+    IEnumerable<string> ITextExtractable.ExtractEntireText()
+    {
+        var textList = new List<string>{ TextMain };
+
+        foreach (var innerItem in InnerItems)
+        {
+            var extractable = innerItem as ITextExtractable;
+            textList.AddRange(extractable.ExtractEntireText());
+        }
+
+        return textList;
     }
 }

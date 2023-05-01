@@ -1,6 +1,7 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LegalProvisionsBackend.Controllers;
@@ -16,10 +17,13 @@ public class SearchController : Controller
     }
     
     [HttpPost]
-    public async Task<IEnumerable<ProvisionHeader>> SearchProvisions([FromBody] QueryModel request)
+    public async Task<ActionResult<IEnumerable<ProvisionHeader>>> SearchProvisions([FromBody] QueryModel? request)
     {
-        var result = await _searchHandler.SearchProvisionsAsync(request);
+        if (string.IsNullOrWhiteSpace(request?.Keyword))
+            return BadRequest();
+        
+        var result = await _searchHandler.SearchProvisionsAsync(request.Keyword);
 
-        return result;
+        return Ok(result);
     }
 }

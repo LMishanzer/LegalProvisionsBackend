@@ -1,9 +1,11 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Text;
+using LegalProvisionsLib.TextExtracting;
+using MongoDB.Bson.Serialization.Attributes;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace LegalProvisionsLib.DataPersistence.Models;
 
-public class ProvisionVersionFields
+public class ProvisionVersionFields : ITextExtractable
 {
     [BsonElement(elementName: "provision_header")]
     public Guid ProvisionHeader { get; set; }
@@ -26,5 +28,11 @@ public class ProvisionVersionFields
     public IEnumerable<ContentItem> GetAllContentDictionary()
     {
         return Content?.GetAllContentInArray() ?? Array.Empty<ContentItem>();
+    }
+
+    IEnumerable<string> ITextExtractable.ExtractEntireText()
+    {
+        var extractable = Content as ITextExtractable;
+        return extractable?.ExtractEntireText() ?? Array.Empty<string>();
     }
 }

@@ -1,10 +1,10 @@
 ﻿namespace LegalProvisionsLib.Search.Indexing;
 
-public interface IIndexer
+public interface IIndexer<T>
 {
-    Task IndexRecordAsync(IndexRecord record);
+    Task IndexRecordAsync(T record);
 
-    Task<IEnumerable<IndexRecord>> GetByRequestAsync(QueryModel query);
+    Task<IEnumerable<T>> GetByKeywordsAsync(string keyword);
 
     Task DeleteRecordAsync(Guid provisionId);
 }

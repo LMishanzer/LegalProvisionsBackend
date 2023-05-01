@@ -6,6 +6,7 @@ using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
 
@@ -68,7 +69,7 @@ public class Startup
         services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
         services.AddTransient<IProvisionHandler, ProvisionHandler>();
         services.AddTransient<IMongoDatabase>(_ => database);
-        services.AddTransient<IIndexer, ElasticsearchIndexer>();
+        services.AddTransient<IIndexer<KeywordsRecord>, KeywordsIndexer>();
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IFileStorage, FilesystemStorage>();
         services.AddTransient<IDocumentManager, DocumentManager>();

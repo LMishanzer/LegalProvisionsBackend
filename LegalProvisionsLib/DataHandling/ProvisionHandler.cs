@@ -7,6 +7,9 @@ using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Helpers;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+using LegalProvisionsLib.TextExtracting;
 
 namespace LegalProvisionsLib.DataHandling;
 
@@ -14,7 +17,8 @@ public class ProvisionHandler : IProvisionHandler
 {
     private readonly ProvisionVersionPersistence _provisionVersionPersistence;
     private readonly ProvisionHeaderPersistence _provisionHeaderPersistence;
-    private readonly IIndexer _indexer;
+    private readonly IIndexer<KeywordsRecord> _keywordsIndexer;
+    private readonly IIndexer<FulltextRecord> _fulltextIndexer;
     private readonly IFileStorage _fileStorage;
     private readonly IDifferenceCalculator _differenceCalculator;
 
@@ -22,13 +26,15 @@ public class ProvisionHandler : IProvisionHandler
         ProvisionVersionPersistence provisionVersionPersistence, 
         IDifferenceCalculator differenceCalculator, 
         ProvisionHeaderPersistence provisionHeaderPersistence,
-        IIndexer indexer,
+        IIndexer<KeywordsRecord> keywordsIndexer,
+        IIndexer<FulltextRecord> fulltextIndexer,
         IFileStorage fileStorage)
     {
         _provisionVersionPersistence = provisionVersionPersistence;
         _differenceCalculator = differenceCalculator;
         _provisionHeaderPersistence = provisionHeaderPersistence;
-        _indexer = indexer;
+        _keywordsIndexer = keywordsIndexer;
+        _fulltextIndexer = fulltextIndexer;
         _fileStorage = fileStorage;
     }
     
@@ -36,17 +42,17 @@ public class ProvisionHandler : IProvisionHandler
     {
         var id = await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
 
-        await _indexer.IndexRecordAsync(new IndexRecord
+        await _keywordsIndexer.IndexRecordAsync(new KeywordsRecord
         {
-            Keyword = headerFields.Title,
+            Keywords = headerFields.Title,
             ProvisionId = id
         });
 
         foreach (var keyword in headerFields.Keywords)
         {
-            await _indexer.IndexRecordAsync(new IndexRecord
+            await _keywordsIndexer.IndexRecordAsync(new KeywordsRecord
             {
-                Keyword = keyword,
+                Keywords = keyword,
                 ProvisionId = id
             });
         }
@@ -75,6 +81,8 @@ public class ProvisionHandler : IProvisionHandler
         header.Fields.DatesOfChange = header.Fields.DatesOfChange.Order().ToList();
 
         await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(headerId, header.Fields);
+
+        await IndexTextFromVersionAsync(versionFields, headerId);
 
         return resultId;
     }
@@ -148,11 +156,16 @@ public class ProvisionHandler : IProvisionHandler
         var documents = versions
             .Select(v => v.Fields.FileMetadata)
             .Where(m => m is not null);
+
+        foreach (var document in documents)
+        {
+            _fileStorage.DeleteFile(document!.NameInStorage);
+        }
         
         await _provisionVersionPersistence.DeleteVersionsByHeaderAsync(headerId);
         await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(headerId);
 
-        await _indexer.DeleteRecordAsync(headerId);
+        await _keywordsIndexer.DeleteRecordAsync(headerId);
     }
 
     public async Task DeleteProvisionVersionAsync(Guid versionId)
@@ -168,5 +181,16 @@ public class ProvisionHandler : IProvisionHandler
         {
             _fileStorage.DeleteFile(version.Fields.FileMetadata.NameInStorage);
         }
+    }
+
+    private async Task IndexTextFromVersionAsync(ITextExtractable provisionVersionFields, Guid provisionId)
+    {
+        var entireText = string.Join(" ", provisionVersionFields.ExtractEntireText());
+        
+        await _fulltextIndexer.IndexRecordAsync(new FulltextRecord
+        {
+            FullText = entireText,
+            ProvisionId = provisionId
+        });
     }
 }

@@ -1,26 +1,27 @@
 ﻿using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using MongoDB.Driver.Linq;
 
 namespace LegalProvisionsLib.Search;
 
 public class SearchHandler : ISearchHandler
 {
-    private readonly IIndexer _indexer;
+    private readonly IIndexer<KeywordsRecord> _indexer;
     private readonly IProvisionHandler _provisionHandler;
 
-    public SearchHandler(IIndexer indexer, IProvisionHandler provisionHandler)
+    public SearchHandler(IIndexer<KeywordsRecord> indexer, IProvisionHandler provisionHandler)
     {
         _indexer = indexer;
         _provisionHandler = provisionHandler;
     }
     
-    public async Task<IEnumerable<ProvisionHeader>> SearchProvisionsAsync(QueryModel request)
+    public async Task<IEnumerable<ProvisionHeader>> SearchProvisionsAsync(string keywords)
     {
-        var searchResult = await _indexer.GetByRequestAsync(request);
+        var searchResult = await _indexer.GetByKeywordsAsync(keywords);
 
-        var indexRecords = searchResult as IndexRecord[] ?? searchResult.ToArray();
+        var indexRecords = searchResult as KeywordsRecord[] ?? searchResult.ToArray();
         var taskList = new List<Task<ProvisionHeader?>>(indexRecords.Length);
         var provisionList = new List<ProvisionHeader>(indexRecords.Length);
 

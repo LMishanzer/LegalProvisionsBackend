@@ -25,7 +25,9 @@ public class ProvisionController : Controller
     [HttpGet("{id:guid}")]
     public async Task<ProvisionVersion> GetActualVersion(Guid id)
     {
-        return await _provisionHandler.GetActualProvisionVersionAsync(id);
+        var provisionVersion = await _provisionHandler.GetActualProvisionVersionAsync(id);
+
+        return provisionVersion;
     }
     
     [HttpGet("{id:guid}")]
