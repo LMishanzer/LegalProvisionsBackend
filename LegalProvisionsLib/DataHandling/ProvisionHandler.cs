@@ -6,7 +6,6 @@ using LegalProvisionsLib.Differences.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Helpers;
-using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using LegalProvisionsLib.TextExtracting;
@@ -17,17 +16,17 @@ public class ProvisionHandler : IProvisionHandler
 {
     private readonly ProvisionVersionPersistence _provisionVersionPersistence;
     private readonly ProvisionHeaderPersistence _provisionHeaderPersistence;
-    private readonly IIndexer<KeywordsRecord> _keywordsIndexer;
-    private readonly IIndexer<FulltextRecord> _fulltextIndexer;
+    private readonly IKeywordsIndexer _keywordsIndexer;
+    private readonly IFulltextIndexer _fulltextIndexer;
     private readonly IFileStorage _fileStorage;
     private readonly IDifferenceCalculator _differenceCalculator;
 
     public ProvisionHandler(
-        ProvisionVersionPersistence provisionVersionPersistence, 
-        IDifferenceCalculator differenceCalculator, 
+        ProvisionVersionPersistence provisionVersionPersistence,
         ProvisionHeaderPersistence provisionHeaderPersistence,
-        IIndexer<KeywordsRecord> keywordsIndexer,
-        IIndexer<FulltextRecord> fulltextIndexer,
+        IDifferenceCalculator differenceCalculator,
+        IKeywordsIndexer keywordsIndexer,
+        IFulltextIndexer fulltextIndexer,
         IFileStorage fileStorage)
     {
         _provisionVersionPersistence = provisionVersionPersistence;
@@ -40,24 +39,29 @@ public class ProvisionHandler : IProvisionHandler
     
     public async Task<Guid> AddProvisionAsync(ProvisionHeaderFields headerFields)
     {
-        var id = await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
+        var provisionId = await _provisionHeaderPersistence.AddProvisionHeaderAsync(headerFields);
+        
+        await IndexKeywordsAndTitleAsync(headerFields, provisionId);
 
+        return provisionId;
+    }
+
+    private async Task IndexKeywordsAndTitleAsync(ProvisionHeaderFields headerFields, Guid provisionId)
+    {
         await _keywordsIndexer.IndexRecordAsync(new KeywordsRecord
         {
-            Keywords = headerFields.Title,
-            ProvisionId = id
+            Text = headerFields.Title,
+            ProvisionId = provisionId
         });
-
+        
         foreach (var keyword in headerFields.Keywords)
         {
             await _keywordsIndexer.IndexRecordAsync(new KeywordsRecord
             {
-                Keywords = keyword,
-                ProvisionId = id
+                Text = keyword,
+                ProvisionId = provisionId
             });
         }
-
-        return id;
     }
 
     public async Task<Guid> AddProvisionVersionAsync(ProvisionVersionFields versionFields)
@@ -76,15 +80,15 @@ public class ProvisionHandler : IProvisionHandler
             throw new ClientSideException("No such provision header", e);
         }
         
-        var resultId = await _provisionVersionPersistence.AddProvisionAsync(versionFields);
+        var newVersionId = await _provisionVersionPersistence.AddProvisionAsync(versionFields);
         header.Fields.DatesOfChange.Add(versionFields.IssueDate);
         header.Fields.DatesOfChange = header.Fields.DatesOfChange.Order().ToList();
 
         await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(headerId, header.Fields);
 
-        await IndexTextFromVersionAsync(versionFields, headerId);
+        await IndexFullTextAsync(provisionVersionFields: versionFields, provisionId: headerId, versionId: newVersionId);
 
-        return resultId;
+        return newVersionId;
     }
 
     public async Task<IEnumerable<ProvisionHeader>> GetAllProvisionsAsync()
@@ -147,6 +151,19 @@ public class ProvisionHandler : IProvisionHandler
     public async Task UpdateVersionAsync(Guid versionId, ProvisionVersionFields versionFields)
     {
         await _provisionVersionPersistence.UpdateVersionAsync(versionId, versionFields);
+        
+        // reindex the version
+        await _fulltextIndexer.DeleteByVersion(versionId);
+        await IndexFullTextAsync(versionFields, versionFields.ProvisionHeader, versionId);
+    }
+
+    public async Task UpdateHeaderAsync(Guid headerId, ProvisionHeaderFields headerFields)
+    {
+        await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(headerId, headerFields);
+
+        // reindex keywords and title
+        await _keywordsIndexer.DeleteByProvisionAsync(headerId);
+        await IndexKeywordsAndTitleAsync(headerFields, headerId);
     }
 
     public async Task DeleteProvisionAsync(Guid headerId)
@@ -165,7 +182,8 @@ public class ProvisionHandler : IProvisionHandler
         await _provisionVersionPersistence.DeleteVersionsByHeaderAsync(headerId);
         await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(headerId);
 
-        await _keywordsIndexer.DeleteRecordAsync(headerId);
+        await _keywordsIndexer.DeleteByProvisionAsync(headerId);
+        await _fulltextIndexer.DeleteByProvisionAsync(headerId);
     }
 
     public async Task DeleteProvisionVersionAsync(Guid versionId)
@@ -181,16 +199,19 @@ public class ProvisionHandler : IProvisionHandler
         {
             _fileStorage.DeleteFile(version.Fields.FileMetadata.NameInStorage);
         }
+
+        await _fulltextIndexer.DeleteByVersion(versionId);
     }
 
-    private async Task IndexTextFromVersionAsync(ITextExtractable provisionVersionFields, Guid provisionId)
+    private async Task IndexFullTextAsync(ITextExtractable provisionVersionFields, Guid provisionId, Guid versionId)
     {
         var entireText = string.Join(" ", provisionVersionFields.ExtractEntireText());
         
         await _fulltextIndexer.IndexRecordAsync(new FulltextRecord
         {
-            FullText = entireText,
-            ProvisionId = provisionId
+            Text = entireText,
+            ProvisionId = provisionId,
+            VersionId = versionId
         });
     }
 }

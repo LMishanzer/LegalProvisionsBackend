@@ -2,8 +2,7 @@
 
 public class FulltextRecord : IRecord
 {
-    public required string FullText { get; init; }
+    public required string Text { get; init; }
     public required Guid ProvisionId { get; init; }
-
-    string IRecord.Text => FullText;
+    public required Guid VersionId { get; init; }
 }

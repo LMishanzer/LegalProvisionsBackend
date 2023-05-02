@@ -6,6 +6,7 @@ using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
@@ -58,18 +59,21 @@ public class Startup
 
     private static void RegisterDependencies(IServiceCollection services)
     {
-        var settings = new SettingsReader().ReadSettings($"Settings{Path.DirectorySeparatorChar}server.settings.json");
+        var settingsPath = Path.Combine("Settings", "server.settings.json");
+        var settings = new SettingsReader().ReadSettings(settingsPath);
         var client = new MongoClient(settings.MongoSettings.ConnectionUri);
         var database = client.GetDatabase(settings.MongoSettings.DatabaseName);
 
-        services.AddTransient<MongoSettings>(_ => settings.MongoSettings);
-        services.AddTransient<ElasticSettings>(_ => settings.ElasticSettings);
-        services.AddTransient<ProvisionVersionPersistence>();
-        services.AddTransient<ProvisionHeaderPersistence>();
+        services.AddSingleton<MongoSettings>(_ => settings.MongoSettings);
+        services.AddSingleton<ElasticSettings>(_ => settings.ElasticSettings);
+        services.AddSingleton<IMongoDatabase>(_ => database);
+        services.AddSingleton<ProvisionVersionPersistence>();
+        services.AddSingleton<ProvisionHeaderPersistence>();
+        
         services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
         services.AddTransient<IProvisionHandler, ProvisionHandler>();
-        services.AddTransient<IMongoDatabase>(_ => database);
-        services.AddTransient<IIndexer<KeywordsRecord>, KeywordsIndexer>();
+        services.AddTransient<IKeywordsIndexer, KeywordsIndexer>();
+        services.AddTransient<IFulltextIndexer, FulltextIndexer>();
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IFileStorage, FilesystemStorage>();
         services.AddTransient<IDocumentManager, DocumentManager>();

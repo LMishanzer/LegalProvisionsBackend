@@ -1,41 +1,51 @@
 ﻿using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Search.Indexing;
+using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
-using MongoDB.Driver.Linq;
 
 namespace LegalProvisionsLib.Search;
 
 public class SearchHandler : ISearchHandler
 {
-    private readonly IIndexer<KeywordsRecord> _indexer;
+    private readonly IKeywordsIndexer _keywordsIndexer;
+    private readonly IFulltextIndexer _fulltextIndexer;
     private readonly IProvisionHandler _provisionHandler;
 
-    public SearchHandler(IIndexer<KeywordsRecord> indexer, IProvisionHandler provisionHandler)
+    public SearchHandler(
+        IKeywordsIndexer keywordsIndexer,
+        IFulltextIndexer fulltextIndexer,
+        IProvisionHandler provisionHandler)
     {
-        _indexer = indexer;
+        _keywordsIndexer = keywordsIndexer;
+        _fulltextIndexer = fulltextIndexer;
         _provisionHandler = provisionHandler;
     }
     
-    public async Task<IEnumerable<ProvisionHeader>> SearchProvisionsAsync(string keywords)
+    public async IAsyncEnumerable<SearchResult> SearchProvisionsAsync(string keywords)
     {
-        var searchResult = await _indexer.GetByKeywordsAsync(keywords);
+        IEnumerable<IRecord> byKeywords = await _keywordsIndexer.GetByKeywordsAsync(keywords);
+        IEnumerable<IRecord> byFulltext = await _fulltextIndexer.GetByKeywordsAsync(keywords);
 
-        var indexRecords = searchResult as KeywordsRecord[] ?? searchResult.ToArray();
-        var taskList = new List<Task<ProvisionHeader?>>(indexRecords.Length);
-        var provisionList = new List<ProvisionHeader>(indexRecords.Length);
+        var allResults = byKeywords.Union(byFulltext);
 
-        foreach (var indexRecord in indexRecords)
+        foreach (var indexRecord in allResults)
         {
-            var currentTask = GetHeaderSafeAsync(indexRecord.ProvisionId); 
-            taskList.Add(currentTask);
+            var header = await GetHeaderSafeAsync(indexRecord.ProvisionId);
+            
+            if (header == null)
+                continue;
+
+            yield return new SearchResult
+            {
+                ProvisionHeader = header,
+                VersionId = indexRecord switch
+                {
+                    FulltextRecord fulltextRecord => fulltextRecord.VersionId,
+                    _ => null
+                }
+            };
         }
-
-        await Task.WhenAll(taskList);
-
-        provisionList.AddRange(taskList.Where(task => task.Result != null).Select(task => task.Result!));
-
-        return provisionList.DistinctBy(p => p.Id);
     }
 
     private async Task<ProvisionHeader?> GetHeaderSafeAsync(Guid provisionId)

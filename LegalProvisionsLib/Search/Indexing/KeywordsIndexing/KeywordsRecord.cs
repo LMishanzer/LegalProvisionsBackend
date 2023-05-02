@@ -2,8 +2,6 @@
 
 public class KeywordsRecord : IRecord
 {
-    public string Keywords { get; set; } = string.Empty;
-    public Guid ProvisionId { get; set; }
-    
-    string IRecord.Text => Keywords;
+    public required string Text { get; init; }
+    public required Guid ProvisionId { get; init; }
 }

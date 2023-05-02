@@ -6,5 +6,5 @@ public interface IIndexer<T>
 
     Task<IEnumerable<T>> GetByKeywordsAsync(string keyword);
 
-    Task DeleteRecordAsync(Guid provisionId);
+    Task DeleteByProvisionAsync(Guid provisionId);
 }

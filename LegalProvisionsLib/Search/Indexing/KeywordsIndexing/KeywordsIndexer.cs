@@ -3,7 +3,7 @@ using Nest;
 
 namespace LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 
-public class KeywordsIndexer : Indexer<KeywordsRecord>
+public class KeywordsIndexer : Indexer<KeywordsRecord>, IKeywordsIndexer
 {
     protected override ElasticClient Client { get; }
     

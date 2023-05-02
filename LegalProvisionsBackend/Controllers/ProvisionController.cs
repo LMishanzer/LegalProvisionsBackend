@@ -84,6 +84,12 @@ public class ProvisionController : Controller
     {
         await _provisionHandler.UpdateVersionAsync(versionId, versionFields);
     }
+    
+    [HttpPut("{headerId:guid}")]
+    public async Task UpdateHeader(Guid headerId, [FromBody] ProvisionHeaderFields headerFields)
+    {
+        await _provisionHandler.UpdateHeaderAsync(headerId, headerFields);
+    }
 
     [HttpDelete("{headerId:guid}")]
     public async Task DeleteProvision(Guid headerId)

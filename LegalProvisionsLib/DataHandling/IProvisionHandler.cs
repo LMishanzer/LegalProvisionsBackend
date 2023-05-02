@@ -17,6 +17,7 @@ public interface IProvisionHandler
     Task<ProvisionDifference> GetVersionDifferencesAsync(Guid original, Guid changed);
     Task<ProvisionDifference> GetVersionDifferencesAsync(DifferenceRequest differenceRequest);
     Task UpdateVersionAsync(Guid versionId, ProvisionVersionFields versionFields);
+    Task UpdateHeaderAsync(Guid headerId, ProvisionHeaderFields headerFields);
     Task DeleteProvisionAsync(Guid headerId);
     Task DeleteProvisionVersionAsync(Guid versionId);
 }

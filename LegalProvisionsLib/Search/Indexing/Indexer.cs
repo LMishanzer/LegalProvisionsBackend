@@ -21,7 +21,7 @@ public abstract class Indexer<T> : IIndexer<T> where T : class, IRecord
         return result.Documents;
     }
 
-    public async Task DeleteRecordAsync(Guid provisionId)
+    public async Task DeleteByProvisionAsync(Guid provisionId)
     {
         await Client.DeleteByQueryAsync<T>(r => r
             .Query(q => q
