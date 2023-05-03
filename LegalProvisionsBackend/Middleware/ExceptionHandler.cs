@@ -1,15 +1,18 @@
 ﻿using System.Text;
 using LegalProvisionsLib.Exceptions;
+using ILogger = LegalProvisionsLib.Logging.ILogger;
 
 namespace LegalProvisionsBackend.Middleware;
 
 public class ExceptionHandler
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger _logger;
 
-    public ExceptionHandler(RequestDelegate next)
+    public ExceptionHandler(RequestDelegate next, ILogger logger)
     {
         _next = next;
+        _logger = logger;
     }
     
     public async Task InvokeAsync(HttpContext httpContext)
@@ -24,7 +27,7 @@ public class ExceptionHandler
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         switch (ex)
         {
@@ -41,5 +44,7 @@ public class ExceptionHandler
             default:
                 throw ex;
         }
+        
+        _logger.LogException(ex);
     }
 }

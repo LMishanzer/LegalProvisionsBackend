@@ -4,12 +4,15 @@ using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.FileStorage;
+using LegalProvisionsLib.Logging;
+using LegalProvisionsLib.Logging.Persistence;
+using LegalProvisionsLib.Logging.Persistence.Elastic;
 using LegalProvisionsLib.Search;
-using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
+using ILogger = LegalProvisionsLib.Logging.ILogger;
 
 namespace LegalProvisionsBackend;
 
@@ -45,6 +48,7 @@ public class Startup
         app.UseFileServer();
         
         app.UseMiddleware<ExceptionHandler>();
+        app.UseMiddleware<RequestMiddleware>();
 
         app.UseRouting();
         app.UseCors(CorsPolicy);
@@ -77,5 +81,7 @@ public class Startup
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IFileStorage, FilesystemStorage>();
         services.AddTransient<IDocumentManager, DocumentManager>();
+        services.AddTransient<ILogger, Logger>();
+        services.AddTransient<ILogPersistence, ElasticsearchPersistence>();
     }
 }
