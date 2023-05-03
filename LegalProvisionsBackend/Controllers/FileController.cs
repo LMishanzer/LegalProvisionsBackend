@@ -1,4 +1,6 @@
-﻿using System.Net.Mime;
+﻿using System.Globalization;
+using System.Net.Mime;
+using System.Text;
 using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.Documents.Models;
 using LegalProvisionsLib.FileStorage.Models;
@@ -48,11 +50,31 @@ public class FileController : Controller
 
         var contentDisposition = new ContentDisposition
         {
-            FileName = file.Name,
+            FileName = RemoveDiacritics(file.Name),
             Size = file.Content.Length
         };
         Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
 
         return File(file.Content, "application/pdf");
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+
+        for (int i = 0; i < normalizedString.Length; i++)
+        {
+            char c = normalizedString[i];
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder
+            .ToString()
+            .Normalize(NormalizationForm.FormC);
     }
 }
