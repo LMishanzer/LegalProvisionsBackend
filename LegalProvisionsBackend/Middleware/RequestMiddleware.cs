@@ -18,6 +18,13 @@ public class RequestMiddleware
     
     public async Task InvokeAsync(HttpContext httpContext)
     {
+        if (httpContext.Request.Path.Value?.Contains("file") ?? false)
+        {
+            await _next(httpContext);
+
+            return;
+        }
+        
         var userIp = httpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
         var url = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.Path.Value}";
@@ -34,6 +41,8 @@ public class RequestMiddleware
         catch (Exception)
         {
             httpContext.Response.StatusCode = 500;
+
+            throw;
         }
         finally
         {

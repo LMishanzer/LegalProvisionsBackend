@@ -27,7 +27,7 @@ public class SearchHandler : ISearchHandler
         IEnumerable<IRecord> byKeywords = await _keywordsIndexer.GetByKeywordsAsync(keywords);
         IEnumerable<IRecord> byFulltext = await _fulltextIndexer.GetByKeywordsAsync(keywords);
 
-        var allResults = byKeywords.Union(byFulltext);
+        var allResults = byKeywords.Union(byFulltext).DistinctBy(p => p.ProvisionId);
 
         foreach (var indexRecord in allResults)
         {

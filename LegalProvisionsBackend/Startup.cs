@@ -47,8 +47,8 @@ public class Startup
         
         app.UseFileServer();
         
-        app.UseMiddleware<ExceptionHandler>();
         app.UseMiddleware<RequestMiddleware>();
+        app.UseMiddleware<ExceptionHandler>();
 
         app.UseRouting();
         app.UseCors(CorsPolicy);

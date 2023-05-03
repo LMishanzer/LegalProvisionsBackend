@@ -195,11 +195,6 @@ public class ProvisionHandler : IProvisionHandler
         await _provisionVersionPersistence.DeleteProvisionAsync(versionId);
         await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(header.Id, header.Fields);
 
-        if (version.Fields.FileMetadata is not null)
-        {
-            _fileStorage.DeleteFile(version.Fields.FileMetadata.NameInStorage);
-        }
-
         await _fulltextIndexer.DeleteByVersion(versionId);
     }
 

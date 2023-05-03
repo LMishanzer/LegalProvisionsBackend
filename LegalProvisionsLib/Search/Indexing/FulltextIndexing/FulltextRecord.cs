@@ -1,6 +1,6 @@
 ﻿namespace LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 
-public class FulltextRecord : IRecord
+public record FulltextRecord : IRecord
 {
     public required string Text { get; init; }
     public required Guid ProvisionId { get; init; }
