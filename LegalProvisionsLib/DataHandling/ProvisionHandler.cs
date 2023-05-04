@@ -114,7 +114,7 @@ public class ProvisionHandler : IProvisionHandler
     
     public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid versionId)
     {
-        return await _provisionVersionPersistence.GetProvisionAsync(versionId);
+        return await _provisionVersionPersistence.GetProvisionVersionAsync(versionId);
     }
 
     public async Task<ProvisionVersion> GetActualProvisionVersionAsync(Guid headerId)
@@ -131,8 +131,8 @@ public class ProvisionHandler : IProvisionHandler
 
     public async Task<ProvisionDifference> GetVersionDifferencesAsync(Guid originalVersionId, Guid changedVersionId)
     {
-        var original = await _provisionVersionPersistence.GetProvisionAsync(originalVersionId);
-        var changed = await _provisionVersionPersistence.GetProvisionAsync(changedVersionId);
+        var original = await _provisionVersionPersistence.GetProvisionVersionAsync(originalVersionId);
+        var changed = await _provisionVersionPersistence.GetProvisionVersionAsync(changedVersionId);
 
         return _differenceCalculator.CalculateDifferences(original, changed);
     }
@@ -188,7 +188,7 @@ public class ProvisionHandler : IProvisionHandler
 
     public async Task DeleteProvisionVersionAsync(Guid versionId)
     {
-        var version = await _provisionVersionPersistence.GetProvisionAsync(versionId);
+        var version = await _provisionVersionPersistence.GetProvisionVersionAsync(versionId);
         var header = await _provisionHeaderPersistence.GetProvisionHeaderAsync(version.Fields.ProvisionHeader);
         var issueDate = version.Fields.IssueDate;
         header.Fields.DatesOfChange.Remove(issueDate);

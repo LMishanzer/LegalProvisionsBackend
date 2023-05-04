@@ -1,12 +1,16 @@
-﻿namespace LegalProvisionsLib.FileStorage;
+﻿using LegalProvisionsLib.Logging;
+
+namespace LegalProvisionsLib.FileStorage;
 
 public class FilesystemStorage : IFileStorage
 {
+    private readonly ILogger _logger;
     private const string DirectoryPath = "AppFiles";
     private readonly DirectoryInfo _directory;
 
-    public FilesystemStorage()
+    public FilesystemStorage(ILogger logger)
     {
+        _logger = logger;
         _directory = GetDirectory();
     }
     
@@ -38,11 +42,15 @@ public class FilesystemStorage : IFileStorage
     {
         var fullFileName = Path.Combine(DirectoryPath, fileName);
         var fileInnerInfo = new FileInfo(fullFileName);
-        
-        if (!fileInnerInfo.Exists)
-            throw new FileNotFoundException($"File {fileName} cannot be found.", fileName);
 
-        fileInnerInfo.Delete();
+        try
+        {
+            fileInnerInfo.Delete();
+        }
+        catch (Exception e)
+        {
+            _logger.LogException(e);
+        }
     }
 
     private static DirectoryInfo GetDirectory()

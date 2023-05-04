@@ -19,7 +19,7 @@ public class ProvisionVersionPersistence : DataPersistence
         return await _provisionCollection.Find(new BsonDocument()).ToListAsync();
     }
 
-    public async Task<ProvisionVersion> GetProvisionAsync(Guid id)
+    public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid id)
     {
         var provisionList = await _provisionCollection.Find(GetFilterById(id)).ToListAsync();
 
@@ -74,7 +74,7 @@ public class ProvisionVersionPersistence : DataPersistence
 
     public async Task UpdateVersionAsync(Guid id, ProvisionVersionFields newProvisionVersionFields)
     {
-        var provision = await GetProvisionAsync(id);
+        var provision = await GetProvisionVersionAsync(id);
         provision.Fields = newProvisionVersionFields;
 
         await _provisionCollection.ReplaceOneAsync(GetFilterById(id), provision);
@@ -82,7 +82,7 @@ public class ProvisionVersionPersistence : DataPersistence
 
     public async Task DeleteProvisionAsync(Guid id)
     {
-        await GetProvisionAsync(id);
+        await GetProvisionVersionAsync(id);
         await _provisionCollection.DeleteOneAsync(GetFilterById(id));
     }
 

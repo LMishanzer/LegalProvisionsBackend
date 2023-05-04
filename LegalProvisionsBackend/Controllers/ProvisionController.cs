@@ -3,6 +3,7 @@ using LegalProvisionsLib.DataHandling.Models;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace LegalProvisionsBackend.Controllers;
 
@@ -80,9 +81,15 @@ public class ProvisionController : Controller
     }
 
     [HttpPut("{versionId:guid}")]
-    public async Task UpdateVersion(Guid versionId, [FromBody] ProvisionVersionFields versionFields)
+    public async Task<IActionResult> UpdateVersion(Guid versionId, 
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Disallow)] ProvisionVersionFields? versionFields)
     {
+        if (versionFields == null)
+            return BadRequest("Version fields cannot be empty.");
+            
         await _provisionHandler.UpdateVersionAsync(versionId, versionFields);
+
+        return Ok();
     }
     
     [HttpPut("{headerId:guid}")]
