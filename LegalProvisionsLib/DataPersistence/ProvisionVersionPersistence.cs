@@ -14,11 +14,6 @@ public class ProvisionVersionPersistence : DataPersistence
         _provisionCollection = database.GetCollection<ProvisionVersion>("ProvisionVersions");
     }
 
-    public async Task<IEnumerable<ProvisionVersion>> GetAllProvisionsAsync()
-    {
-        return await _provisionCollection.Find(new BsonDocument()).ToListAsync();
-    }
-
     public async Task<ProvisionVersion> GetProvisionVersionAsync(Guid id)
     {
         var provisionList = await _provisionCollection.Find(GetFilterById(id)).ToListAsync();
