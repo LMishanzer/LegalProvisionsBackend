@@ -192,8 +192,17 @@ public class ProvisionHandler : IProvisionHandler
         var header = await _provisionHeaderPersistence.GetProvisionHeaderAsync(version.Fields.ProvisionHeader);
         var issueDate = version.Fields.IssueDate;
         header.Fields.DatesOfChange.Remove(issueDate);
+
         await _provisionVersionPersistence.DeleteProvisionAsync(versionId);
-        await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(header.Id, header.Fields);
+        
+        if (header.Fields.DatesOfChange.Count == 0)
+        {
+            await _provisionHeaderPersistence.DeleteProvisionHeaderAsync(header.Id);
+        }
+        else
+        {
+            await _provisionHeaderPersistence.UpdateProvisionHeaderAsync(header.Id, header.Fields);
+        }
 
         await _fulltextIndexer.DeleteByVersion(versionId);
     }
