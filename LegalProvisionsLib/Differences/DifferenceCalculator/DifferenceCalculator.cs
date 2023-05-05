@@ -1,7 +1,7 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences.Models;
 
-namespace LegalProvisionsLib.Differences;
+namespace LegalProvisionsLib.Differences.DifferenceCalculator;
 
 public class DifferenceCalculator : IDifferenceCalculator
 {

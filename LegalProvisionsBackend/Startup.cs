@@ -2,6 +2,7 @@
 using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
+using LegalProvisionsLib.Differences.DifferenceCalculator;
 using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Logging;
@@ -73,15 +74,16 @@ public class Startup
         services.AddSingleton<IMongoDatabase>(_ => database);
         services.AddSingleton<ProvisionVersionPersistence>();
         services.AddSingleton<ProvisionHeaderPersistence>();
+        services.AddSingleton<IDifferenceCalculator, DifferenceCalculator>();
+        services.AddSingleton<ILogger, Logger>();
+        services.AddSingleton<ILogPersistence, ElasticsearchPersistence>();
+        services.AddSingleton<IFileStorage, FilesystemStorage>();
+        services.AddSingleton<IKeywordsIndexer, KeywordsIndexer>();
+        services.AddSingleton<IFulltextIndexer, FulltextIndexer>();
         
-        services.AddTransient<IDifferenceCalculator, DifferenceCalculator>();
         services.AddTransient<IProvisionHandler, ProvisionHandler>();
-        services.AddTransient<IKeywordsIndexer, KeywordsIndexer>();
-        services.AddTransient<IFulltextIndexer, FulltextIndexer>();
         services.AddTransient<ISearchHandler, SearchHandler>();
-        services.AddTransient<IFileStorage, FilesystemStorage>();
         services.AddTransient<IDocumentManager, DocumentManager>();
-        services.AddTransient<ILogger, Logger>();
-        services.AddTransient<ILogPersistence, ElasticsearchPersistence>();
+        services.AddTransient<IDifferenceManager, DifferenceManager>();
     }
 }

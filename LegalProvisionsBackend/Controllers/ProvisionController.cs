@@ -1,7 +1,6 @@
 ﻿using LegalProvisionsLib.DataHandling;
 using LegalProvisionsLib.DataHandling.Models;
 using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.Differences.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -66,18 +65,6 @@ public class ProvisionController : Controller
     public async Task<Guid> AddProvisionVersion([FromBody] ProvisionVersionFields versionFields)
     {
         return await _provisionHandler.AddProvisionVersionAsync(versionFields);
-    }
-
-    [HttpGet("{originalId:guid}/{changedId:guid}")]
-    public async Task<ProvisionDifference> GetDifferences(Guid originalId, Guid changedId)
-    {
-        return await _provisionHandler.GetVersionDifferencesAsync(originalId, changedId);
-    }
-
-    [HttpPost]
-    public async Task<ProvisionDifference> GetDifferences([FromBody] DifferenceRequest differenceRequest)
-    {
-        return await _provisionHandler.GetVersionDifferencesAsync(differenceRequest);
     }
 
     [HttpPut("{versionId:guid}")]

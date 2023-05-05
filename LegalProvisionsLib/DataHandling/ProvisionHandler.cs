@@ -1,8 +1,6 @@
 ﻿using LegalProvisionsLib.DataHandling.Models;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.Differences;
-using LegalProvisionsLib.Differences.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Helpers;
@@ -19,18 +17,15 @@ public class ProvisionHandler : IProvisionHandler
     private readonly IKeywordsIndexer _keywordsIndexer;
     private readonly IFulltextIndexer _fulltextIndexer;
     private readonly IFileStorage _fileStorage;
-    private readonly IDifferenceCalculator _differenceCalculator;
 
     public ProvisionHandler(
         ProvisionVersionPersistence provisionVersionPersistence,
         ProvisionHeaderPersistence provisionHeaderPersistence,
-        IDifferenceCalculator differenceCalculator,
         IKeywordsIndexer keywordsIndexer,
         IFulltextIndexer fulltextIndexer,
         IFileStorage fileStorage)
     {
         _provisionVersionPersistence = provisionVersionPersistence;
-        _differenceCalculator = differenceCalculator;
         _provisionHeaderPersistence = provisionHeaderPersistence;
         _keywordsIndexer = keywordsIndexer;
         _fulltextIndexer = fulltextIndexer;
@@ -127,25 +122,6 @@ public class ProvisionHandler : IProvisionHandler
         {
             throw new ClientSideException("Provision doesn't have any version", e);
         }
-    }
-
-    public async Task<ProvisionDifference> GetVersionDifferencesAsync(Guid originalVersionId, Guid changedVersionId)
-    {
-        var original = await _provisionVersionPersistence.GetProvisionVersionAsync(originalVersionId);
-        var changed = await _provisionVersionPersistence.GetProvisionVersionAsync(changedVersionId);
-
-        return _differenceCalculator.CalculateDifferences(original, changed);
-    }
-
-    public async Task<ProvisionDifference> GetVersionDifferencesAsync(DifferenceRequest differenceRequest)
-    {
-        var firstDate = DateHelper.DateTimeToDate(differenceRequest.FirstProvisionIssue);
-        var secondDate = DateHelper.DateTimeToDate(differenceRequest.SecondProvisionIssue);
-
-        var firstProvision = await _provisionVersionPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, firstDate);
-        var secondProvision = await _provisionVersionPersistence.GetProvisionVersionAsync(differenceRequest.ProvisionId, secondDate);
-
-        return _differenceCalculator.CalculateDifferences(firstProvision, secondProvision);
     }
 
     public async Task UpdateVersionAsync(Guid versionId, ProvisionVersionFields versionFields)
