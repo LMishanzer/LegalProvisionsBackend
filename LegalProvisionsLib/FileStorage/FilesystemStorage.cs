@@ -1,11 +1,12 @@
 ﻿using LegalProvisionsLib.Logging;
+using LegalProvisionsLib.Settings;
 
 namespace LegalProvisionsLib.FileStorage;
 
 public class FilesystemStorage : IFileStorage
 {
     private readonly ILogger _logger;
-    private const string DirectoryPath = "AppFiles";
+    private const string DirectoryPath = StaticSettings.PersistantFileStorage;
     private readonly DirectoryInfo _directory;
 
     public FilesystemStorage(ILogger logger)
