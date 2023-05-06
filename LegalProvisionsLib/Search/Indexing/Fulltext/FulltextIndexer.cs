@@ -1,7 +1,7 @@
 ﻿using LegalProvisionsLib.Settings;
 using Nest;
 
-namespace LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+namespace LegalProvisionsLib.Search.Indexing.Fulltext;
 
 public class FulltextIndexer : Indexer<FulltextRecord>, IFulltextIndexer
 {

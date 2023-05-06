@@ -1,4 +1,4 @@
-﻿namespace LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+﻿namespace LegalProvisionsLib.Search.Indexing.Fulltext;
 
 public record FulltextRecord : IRecord
 {

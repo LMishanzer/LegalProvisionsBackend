@@ -1,7 +1,7 @@
 ﻿using LegalProvisionsLib.Settings;
 using Nest;
 
-namespace LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+namespace LegalProvisionsLib.Search.Indexing.Keywords;
 
 public class KeywordsIndexer : Indexer<KeywordsRecord>, IKeywordsIndexer
 {

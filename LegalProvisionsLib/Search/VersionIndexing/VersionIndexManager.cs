@@ -1,4 +1,4 @@
-﻿using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+﻿using LegalProvisionsLib.Search.Indexing.Fulltext;
 using LegalProvisionsLib.TextExtracting;
 
 namespace LegalProvisionsLib.Search.VersionIndexing;

@@ -1,4 +1,4 @@
-﻿namespace LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+﻿namespace LegalProvisionsLib.Search.Indexing.Fulltext;
 
 public interface IFulltextIndexer : IIndexer<FulltextRecord>
 {
