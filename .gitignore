@@ -7,3 +7,7 @@ riderModule.iml
 wwwroot
 LegalProvisionsApplication
 publish
+.vs/
+doxygen_doc/
+.config/
+*.tag
