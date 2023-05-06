@@ -1,5 +1,4 @@
-﻿using System.Text;
-using LegalProvisionsLib.TextExtracting;
+﻿using LegalProvisionsLib.TextExtracting;
 using MongoDB.Bson.Serialization.Attributes;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
