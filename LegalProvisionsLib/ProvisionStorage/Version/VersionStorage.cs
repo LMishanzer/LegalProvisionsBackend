@@ -1,5 +1,5 @@
-﻿using LegalProvisionsLib.DataHandling.Version;
-using LegalProvisionsLib.DataPersistence.Models;
+﻿using LegalProvisionsLib.DataPersistence.Models;
+using LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
 using LegalProvisionsLib.Search.VersionIndexing;
 
 namespace LegalProvisionsLib.ProvisionStorage.Version;

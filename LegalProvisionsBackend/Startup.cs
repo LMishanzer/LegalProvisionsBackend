@@ -1,6 +1,4 @@
 ﻿using LegalProvisionsBackend.Middleware;
-using LegalProvisionsLib.DataHandling.Header;
-using LegalProvisionsLib.DataHandling.Version;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.DifferenceCalculator;
@@ -9,6 +7,8 @@ using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Logging;
 using LegalProvisionsLib.Logging.Persistence;
 using LegalProvisionsLib.Logging.Persistence.Elastic;
+using LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
+using LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
 using LegalProvisionsLib.ProvisionStorage.Header;
 using LegalProvisionsLib.ProvisionStorage.Version;
 using LegalProvisionsLib.Search;

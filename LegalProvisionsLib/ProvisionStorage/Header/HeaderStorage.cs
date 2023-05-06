@@ -1,5 +1,5 @@
-﻿using LegalProvisionsLib.DataHandling.Header;
-using LegalProvisionsLib.DataPersistence.Models;
+﻿using LegalProvisionsLib.DataPersistence.Models;
+using LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
 using LegalProvisionsLib.Search.HeaderIndexing;
 
 namespace LegalProvisionsLib.ProvisionStorage.Header;

@@ -1,8 +1,9 @@
 ﻿using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.FileStorage;
+using LegalProvisionsLib.ProvisionStorage.Header;
 
-namespace LegalProvisionsLib.DataHandling.Header;
+namespace LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
 
 public class HeaderHandler : IHeaderHandler
 {

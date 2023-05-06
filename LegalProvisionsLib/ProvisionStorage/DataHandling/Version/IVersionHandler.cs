@@ -1,6 +1,6 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 
-namespace LegalProvisionsLib.DataHandling.Version;
+namespace LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
 
 public interface IVersionHandler : IProvisionHandler<ProvisionVersionFields>
 {
