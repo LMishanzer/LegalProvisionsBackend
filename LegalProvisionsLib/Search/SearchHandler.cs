@@ -1,39 +1,32 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.ProvisionStorage.Header;
-using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
-using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+using LegalProvisionsLib.Search.SearchResultsHandling;
 
 namespace LegalProvisionsLib.Search;
 
 public class SearchHandler : ISearchHandler
 {
-    private readonly IKeywordsIndexer _keywordsIndexer;
-    private readonly IFulltextIndexer _fulltextIndexer;
+    private readonly ISearchResultHandler _searchResultHandler;
     private readonly IHeaderStorage _provisionStorage;
 
     public SearchHandler(
-        IKeywordsIndexer keywordsIndexer,
-        IFulltextIndexer fulltextIndexer,
+        ISearchResultHandler searchResultHandler,
         IHeaderStorage provisionStorage)
     {
-        _keywordsIndexer = keywordsIndexer;
-        _fulltextIndexer = fulltextIndexer;
+        _searchResultHandler = searchResultHandler;
         _provisionStorage = provisionStorage;
     }
     
     public async IAsyncEnumerable<SearchResult> SearchProvisionsAsync(string keywords)
     {
-        IEnumerable<IRecord> byKeywords = await _keywordsIndexer.GetByKeywordsAsync(keywords);
-        IEnumerable<IRecord> byFulltext = await _fulltextIndexer.GetByKeywordsAsync(keywords);
+        var searchResults = await _searchResultHandler.GetSearchResultsAsync(keywords);
 
-        var allResults = byKeywords.Union(byFulltext).DistinctBy(p => p.ProvisionId);
-
-        foreach (var indexRecord in allResults)
+        foreach (var indexRecord in searchResults)
         {
             var header = await GetHeaderSafeAsync(indexRecord.ProvisionId);
             
-            if (header == null)
+            if (header is null)
                 continue;
 
             yield return new SearchResult

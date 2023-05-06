@@ -15,6 +15,7 @@ using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.HeaderIndexing;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+using LegalProvisionsLib.Search.SearchResultsHandling;
 using LegalProvisionsLib.Search.VersionIndexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
@@ -95,5 +96,6 @@ public class Startup
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IDocumentManager, DocumentManager>();
         services.AddTransient<IDifferenceManager, DifferenceManager>();
+        services.AddTransient<ISearchResultHandler, SearchResultHandler>();
     }
 }
