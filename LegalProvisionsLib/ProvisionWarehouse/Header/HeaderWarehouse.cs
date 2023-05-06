@@ -1,5 +1,6 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Header;
+using LegalProvisionsLib.References;
 using LegalProvisionsLib.Search.HeaderIndexing;
 
 namespace LegalProvisionsLib.ProvisionWarehouse.Header;
@@ -8,13 +9,16 @@ public class HeaderWarehouse : IHeaderWarehouse
 {
     private readonly IHeaderHandler _headerHandler;
     private readonly IHeaderIndexManager _headerIndexManager;
+    private readonly IReferenceManager _referenceManager;
 
     public HeaderWarehouse(
         IHeaderHandler headerHandler,
-        IHeaderIndexManager headerIndexManager)
+        IHeaderIndexManager headerIndexManager,
+        IReferenceManager referenceManager)
     {
         _headerHandler = headerHandler;
         _headerIndexManager = headerIndexManager;
+        _referenceManager = referenceManager;
     }
     
     public async Task<Guid> AddAsync(ProvisionHeaderFields headerFields)
@@ -38,12 +42,14 @@ public class HeaderWarehouse : IHeaderWarehouse
     public async Task DeleteAsync(Guid headerId)
     {
         var deleteTask = _headerHandler.DeleteAsync(headerId);
-        var removeDocsTask = RemoveIndexesDocuments(headerId);
+        var removeDocsTask = RemoveIndexesDocumentsAsync(headerId);
+        var removeReferencesTask = _referenceManager.RemoveByHeaderIdAsync(headerId);
 
-        await Task.WhenAll(deleteTask, removeDocsTask);
+        await Task.WhenAll(deleteTask, removeDocsTask, removeReferencesTask);
     }
 
-    public async Task<IEnumerable<ProvisionHeader>> GetAllProvisionsAsync() => await _headerHandler.GetAllProvisionsAsync();
+    public async Task<IEnumerable<ProvisionHeader>> GetAllProvisionsAsync() => 
+        await _headerHandler.GetAllProvisionsAsync();
 
     public async Task<IEnumerable<ProvisionHeader>> GetProvisionHeadersAsync(ProvisionHeadersRequest request) => 
         await _headerHandler.GetProvisionHeadersAsync(request);
@@ -54,7 +60,7 @@ public class HeaderWarehouse : IHeaderWarehouse
         await _headerIndexManager.IndexAsync(headerFields, headerId);
     }
     
-    private async Task RemoveIndexesDocuments(Guid headerId)
+    private async Task RemoveIndexesDocumentsAsync(Guid headerId)
     {
         await _headerIndexManager.RemoveKeywordsAsync(headerId);
         await _headerIndexManager.RemoveFullTextAsync(headerId);

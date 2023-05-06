@@ -11,6 +11,7 @@ using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Header;
 using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Version;
 using LegalProvisionsLib.ProvisionWarehouse.Header;
 using LegalProvisionsLib.ProvisionWarehouse.Version;
+using LegalProvisionsLib.References;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.HeaderIndexing;
 using LegalProvisionsLib.Search.Indexing.Fulltext;
@@ -97,5 +98,6 @@ public class Startup
         services.AddTransient<IDocumentManager, DocumentManager>();
         services.AddTransient<IDifferenceManager, DifferenceManager>();
         services.AddTransient<ISearchResultHandler, SearchResultHandler>();
+        services.AddTransient<IReferenceManager, ReferenceManager>();
     }
 }

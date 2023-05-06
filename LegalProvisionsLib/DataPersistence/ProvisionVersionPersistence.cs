@@ -81,11 +81,19 @@ public class ProvisionVersionPersistence : DataPersistence
         await _provisionCollection.DeleteOneAsync(GetFilterById(id));
     }
 
-    public async Task DeleteAllProvisionsAsync() => await _provisionCollection.DeleteManyAsync(new BsonDocument());
-
     public async Task DeleteVersionsByHeaderAsync(Guid headerId)
     {
         var filter = Builders<ProvisionVersion>.Filter.Eq(version => version.Fields.ProvisionHeader, headerId);
         await _provisionCollection.DeleteManyAsync(filter);
+    }
+
+    public async Task RemoveReferencesToHeaderAsync(Guid headerId)
+    {
+        var filter = Builders<ProvisionVersion>.Filter.ElemMatch(x => x.Fields.Content!.References, 
+            o => o.ProvisionId == headerId);
+        var update = Builders<ProvisionVersion>.Update.PullFilter(x => 
+            x.Fields.Content!.References, o => o.ProvisionId == headerId);
+        
+        await _provisionCollection.UpdateManyAsync(filter, update);
     }
 }
