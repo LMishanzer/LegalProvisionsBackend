@@ -1,60 +1,91 @@
-﻿using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
+﻿using LegalProvisionsLib.DataPersistence.Models;
+using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.Search;
+using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+using LegalProvisionsLib.Search.SearchResultsHandling;
 using Moq;
 
 namespace LegalProvisionsLibTest.Search;
 
 public class SearchHandlerTest
 {
-    private readonly Mock<IKeywordsIndexer> _keywordsIndexer = new();
-    private readonly Mock<IFulltextIndexer> _fulltextIndexer = new();
-    // private readonly Mock<IProvisionHandler> _provisionHandler = new();
+    private readonly Mock<ISearchResultHandler> _searchResultHandler = new();
+    private readonly Mock<IHeaderStorage> _headerStorage = new();
 
     private const string SearchCase1 = "some text";
-        
+
+    private readonly List<ProvisionHeader> _result = new();
+
     [SetUp]
     public void Setup()
     {
-        var firstId = Guid.NewGuid(); 
-        var secondId = Guid.NewGuid(); 
-        var thirdId = Guid.NewGuid();
-        var fourthId = Guid.NewGuid();
+        var firstRecord = GetNewRecord();
+        var secondRecord = GetNewRecord();
         
-        SetupKeywordsIndexer(firstId, secondId);
-        _fulltextIndexer.Setup(k => k
-                .GetByKeywordsAsync(SearchCase1))
-            .Returns(() => new List<KeywordsRecord>
-            {
-                new()
-                {
-                    ProvisionId = firstId,
-                    Text = "some text 1"
-                },
-                new()
-                {
-                    ProvisionId = secondId,
-                    Text = "some text 2"
-                }
-            });
-        
+        SetupSearchResultHandler(firstRecord, secondRecord);
+        SetupHeaderStorage(firstRecord, secondRecord);
     }
 
-    private void SetupKeywordsIndexer(Guid firstId, Guid secondId)
+    [Test]
+    public async Task TestCase()
     {
-        _keywordsIndexer.Setup(k => k
-                .GetByKeywordsAsync(SearchCase1))
-            .Returns(() => new List<KeywordsRecord>
+        // Arrange
+        var searchHandler = new SearchHandler(_searchResultHandler.Object, _headerStorage.Object);
+        
+        // Act
+        var result = searchHandler.SearchProvisionsAsync(SearchCase1);
+        
+        // Assert
+        await foreach (var searchResult in result)
+        {
+            Assert.That(_result, Does.Contain(searchResult.ProvisionHeader));
+            _result.Remove(searchResult.ProvisionHeader);
+        }
+        
+        Assert.That(_result, Is.Empty);
+    }
+
+    private static KeywordsRecord GetNewRecord()
+    {
+        return new KeywordsRecord
+        {
+            ProvisionId = Guid.NewGuid(),
+            Text = SearchCase1
+        };
+    }
+
+    private void SetupSearchResultHandler(KeywordsRecord firstRecord, KeywordsRecord secondRecord)
+    {
+        _searchResultHandler.Setup(k => k
+                .GetSearchResultsAsync(SearchCase1))
+            .Returns(() => Task.FromResult((IEnumerable<IRecord>) new List<KeywordsRecord>
             {
-                new()
+                firstRecord,
+                secondRecord
+            }));
+    }
+
+    private void SetupHeaderStorage(IRecord firstRecord, IRecord secondRecord)
+    {
+        SetupHeaderStorageResponse(firstRecord);
+        SetupHeaderStorageResponse(secondRecord);
+    }
+
+    private void SetupHeaderStorageResponse(IRecord record)
+    {
+        _headerStorage.Setup(h => h
+                .GetOneAsync(record.ProvisionId))
+            .Returns(() =>
+            {
+                var header = new ProvisionHeader(new ProvisionHeaderFields())
                 {
-                    ProvisionId = firstId,
-                    Text = "some text 1"
-                },
-                new()
-                {
-                    ProvisionId = secondId,
-                    Text = "some text 2"
-                }
+                    Id = record.ProvisionId
+                };
+                
+                _result.Add(header);
+
+                return Task.FromResult((DataItem<ProvisionHeaderFields>)header);
             });
     }
 }
