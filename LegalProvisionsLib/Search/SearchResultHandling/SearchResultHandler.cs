@@ -26,10 +26,9 @@ public class SearchResultHandler : ISearchResultHandler
         var keywordsResult = (IEnumerable<IRecord>)keywordsResultTask.Result;
         var fulltextResult = (IEnumerable<IRecord>)fulltextResultTask.Result;
 
-        // concat the lists, Concat will preserve the order of the elements
-        var allResultsUnion = keywordsResult.Concat(fulltextResult);
-        var withoutDuplicities = allResultsUnion.DistinctBy(p => p.ProvisionId);
+        // concat the lists without duplicities
+        var allResults = keywordsResult.UnionBy(fulltextResult, p => p.ProvisionId);
 
-        return withoutDuplicities;
+        return allResults;
     }
 }
