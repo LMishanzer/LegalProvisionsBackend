@@ -19,6 +19,7 @@ using LegalProvisionsLib.Search.Indexing.Keywords;
 using LegalProvisionsLib.Search.SearchResultHandling;
 using LegalProvisionsLib.Search.VersionIndexing;
 using LegalProvisionsLib.Settings;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using ILogger = LegalProvisionsLib.Logging.ILogger;
 
@@ -44,6 +45,11 @@ public class Startup
                         .AllowAnyHeader();
                 });
         });
+        
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Provision API", Version = "v1" });
+        });
     }
     
     public void Configure(WebApplication app, IWebHostEnvironment env)
@@ -54,6 +60,12 @@ public class Startup
         }
         
         app.UseFileServer();
+        
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Provision API V1");
+        });
         
         app.UseMiddleware<RequestMiddleware>();
         app.UseMiddleware<ExceptionHandler>();
