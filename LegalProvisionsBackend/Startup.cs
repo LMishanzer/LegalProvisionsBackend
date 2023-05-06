@@ -7,10 +7,10 @@ using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Logging;
 using LegalProvisionsLib.Logging.Persistence;
 using LegalProvisionsLib.Logging.Persistence.Elastic;
-using LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
-using LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
-using LegalProvisionsLib.ProvisionStorage.Header;
-using LegalProvisionsLib.ProvisionStorage.Version;
+using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Header;
+using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Version;
+using LegalProvisionsLib.ProvisionWarehouse.Header;
+using LegalProvisionsLib.ProvisionWarehouse.Version;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.HeaderIndexing;
 using LegalProvisionsLib.Search.Indexing.Fulltext;
@@ -89,8 +89,8 @@ public class Startup
         
         services.AddTransient<IVersionHandler, VersionHandler>();
         services.AddTransient<IHeaderHandler, HeaderHandler>();
-        services.AddTransient<IVersionStorage, VersionStorage>();
-        services.AddTransient<IHeaderStorage, HeaderStorage>();
+        services.AddTransient<IVersionWarehouse, VersionWarehouse>();
+        services.AddTransient<IHeaderWarehouse, HeaderWarehouse>();
         services.AddTransient<IVersionIndexManager, VersionIndexManager>();
         services.AddTransient<IHeaderIndexManager, HeaderIndexManager>();
         services.AddTransient<ISearchHandler, SearchHandler>();

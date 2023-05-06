@@ -1,15 +1,15 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
+using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Version;
 using LegalProvisionsLib.Search.VersionIndexing;
 
-namespace LegalProvisionsLib.ProvisionStorage.Version;
+namespace LegalProvisionsLib.ProvisionWarehouse.Version;
 
-public class VersionStorage : IVersionStorage
+public class VersionWarehouse : IVersionWarehouse
 {
     private readonly IVersionHandler _versionHandler;
     private readonly IVersionIndexManager _versionIndexManager;
 
-    public VersionStorage(
+    public VersionWarehouse(
         IVersionHandler versionHandler,
         IVersionIndexManager versionIndexManager)
     {

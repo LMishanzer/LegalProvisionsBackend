@@ -1,5 +1,5 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.ProvisionWarehouse.Header;
 using LegalProvisionsLib.Search.Indexing.Fulltext;
 using LegalProvisionsLib.Search.SearchResultHandling;
 
@@ -8,14 +8,14 @@ namespace LegalProvisionsLib.Search;
 public class SearchHandler : ISearchHandler
 {
     private readonly ISearchResultHandler _searchResultHandler;
-    private readonly IHeaderStorage _provisionStorage;
+    private readonly IHeaderWarehouse _provisionWarehouse;
 
     public SearchHandler(
         ISearchResultHandler searchResultHandler,
-        IHeaderStorage provisionStorage)
+        IHeaderWarehouse provisionWarehouse)
     {
         _searchResultHandler = searchResultHandler;
-        _provisionStorage = provisionStorage;
+        _provisionWarehouse = provisionWarehouse;
     }
     
     public async IAsyncEnumerable<SearchResult> SearchProvisionsAsync(string keywords)
@@ -45,7 +45,7 @@ public class SearchHandler : ISearchHandler
     {
         try
         {
-            return await _provisionStorage.GetOneAsync(provisionId) as ProvisionHeader;
+            return await _provisionWarehouse.GetOneAsync(provisionId) as ProvisionHeader;
         }
         catch (Exception e)
         {

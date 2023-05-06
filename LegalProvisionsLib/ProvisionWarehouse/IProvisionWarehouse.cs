@@ -1,8 +1,8 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 
-namespace LegalProvisionsLib.ProvisionStorage;
+namespace LegalProvisionsLib.ProvisionWarehouse;
 
-public interface IProvisionStorage<T> where T : class
+public interface IProvisionWarehouse<T> where T : class
 {
     Task<Guid> AddAsync(T fields);
     Task<DataItem<T>> GetOneAsync(Guid headerId);

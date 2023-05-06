@@ -1,7 +1,7 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.ProvisionWarehouse.Header;
 
-namespace LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
+namespace LegalProvisionsLib.ProvisionWarehouse.DataHandling.Header;
 
 public interface IHeaderHandler : IProvisionHandler<ProvisionHeaderFields>
 {

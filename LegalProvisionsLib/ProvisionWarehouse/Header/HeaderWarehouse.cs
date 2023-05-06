@@ -1,15 +1,15 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.ProvisionStorage.DataHandling.Header;
+using LegalProvisionsLib.ProvisionWarehouse.DataHandling.Header;
 using LegalProvisionsLib.Search.HeaderIndexing;
 
-namespace LegalProvisionsLib.ProvisionStorage.Header;
+namespace LegalProvisionsLib.ProvisionWarehouse.Header;
 
-public class HeaderStorage : IHeaderStorage
+public class HeaderWarehouse : IHeaderWarehouse
 {
     private readonly IHeaderHandler _headerHandler;
     private readonly IHeaderIndexManager _headerIndexManager;
 
-    public HeaderStorage(
+    public HeaderWarehouse(
         IHeaderHandler headerHandler,
         IHeaderIndexManager headerIndexManager)
     {

@@ -3,24 +3,24 @@ using LegalProvisionsLib.Documents.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.FileStorage.Models;
-using LegalProvisionsLib.ProvisionStorage.Version;
+using LegalProvisionsLib.ProvisionWarehouse.Version;
 
 namespace LegalProvisionsLib.Documents;
 
 public class DocumentManager : IDocumentManager
 {
-    private readonly IVersionStorage _versionStorage;
+    private readonly IVersionWarehouse _versionWarehouse;
     private readonly IFileStorage _fileStorage;
 
-    public DocumentManager(IVersionStorage versionStorage, IFileStorage fileStorage)
+    public DocumentManager(IVersionWarehouse versionWarehouse, IFileStorage fileStorage)
     {
-        _versionStorage = versionStorage;
+        _versionWarehouse = versionWarehouse;
         _fileStorage = fileStorage;
     }
     
     public async Task AddProvisionDocumentAsync(Document document)
     {
-        var version = await _versionStorage.GetOneAsync(document.VersionId);
+        var version = await _versionWarehouse.GetOneAsync(document.VersionId);
         
         if (version.Fields.FileMetadata is not null)
         {
@@ -31,12 +31,12 @@ public class DocumentManager : IDocumentManager
         
         version.Fields.FileMetadata = new FileMetadata(name: document.File.Name, nameInStorage: fileName) ;
         
-        await _versionStorage.UpdateAsync(version.Id, version.Fields);
+        await _versionWarehouse.UpdateAsync(version.Id, version.Fields);
     }
 
     public async Task<FileToStore> GetProvisionDocumentAsync(Guid versionId)
     {
-        var version = await _versionStorage.GetOneAsync(versionId);
+        var version = await _versionWarehouse.GetOneAsync(versionId);
         var fileMetadata = version.Fields.FileMetadata;
 
         if (fileMetadata is null)

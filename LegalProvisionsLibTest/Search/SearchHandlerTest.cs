@@ -1,5 +1,5 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
-using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.ProvisionWarehouse.Header;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.Keywords;
@@ -11,7 +11,7 @@ namespace LegalProvisionsLibTest.Search;
 public class SearchHandlerTest
 {
     private readonly Mock<ISearchResultHandler> _searchResultHandler = new();
-    private readonly Mock<IHeaderStorage> _headerStorage = new();
+    private readonly Mock<IHeaderWarehouse> _headerStorage = new();
 
     private const string SearchCase1 = "some text";
 

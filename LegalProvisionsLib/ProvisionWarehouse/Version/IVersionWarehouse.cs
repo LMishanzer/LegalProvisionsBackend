@@ -1,8 +1,8 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 
-namespace LegalProvisionsLib.ProvisionStorage.Version;
+namespace LegalProvisionsLib.ProvisionWarehouse.Version;
 
-public interface IVersionStorage : IProvisionStorage<ProvisionVersionFields>
+public interface IVersionWarehouse : IProvisionWarehouse<ProvisionVersionFields>
 {
     Task<ProvisionVersion> GetActualProvisionVersionAsync(Guid headerId);
     Task<ProvisionVersion> GetProvisionVersionAsync(Guid headerId, DateTime issueDate);

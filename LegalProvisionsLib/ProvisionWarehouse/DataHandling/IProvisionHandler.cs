@@ -1,6 +1,6 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 
-namespace LegalProvisionsLib.ProvisionStorage.DataHandling;
+namespace LegalProvisionsLib.ProvisionWarehouse.DataHandling;
 
 public interface IProvisionHandler<T> where T : class
 {

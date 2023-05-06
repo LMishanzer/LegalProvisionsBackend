@@ -3,7 +3,7 @@ using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.Helpers;
 
-namespace LegalProvisionsLib.ProvisionStorage.DataHandling.Version;
+namespace LegalProvisionsLib.ProvisionWarehouse.DataHandling.Version;
 
 public class VersionHandler : IVersionHandler
 {
