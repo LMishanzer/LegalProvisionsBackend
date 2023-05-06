@@ -1,6 +1,6 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Differences.DifferenceCalculator;
-using LegalProvisionsLibTest.Helpers;
+using LegalProvisionsLibTest.Utilities;
 
 namespace LegalProvisionsLibTest.Differences;
 

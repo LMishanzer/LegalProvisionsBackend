@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace LegalProvisionsLibTest.Helpers;
+namespace LegalProvisionsLibTest.Utilities;
 
 public static class DeepCopyHelper
 {

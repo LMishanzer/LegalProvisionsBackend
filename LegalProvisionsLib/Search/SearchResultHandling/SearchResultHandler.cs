@@ -2,7 +2,7 @@
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
 
-namespace LegalProvisionsLib.Search.SearchResultsHandling;
+namespace LegalProvisionsLib.Search.SearchResultHandling;
 
 public class SearchResultHandler : ISearchResultHandler
 {

@@ -1,7 +1,7 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.ProvisionStorage.Header;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
-using LegalProvisionsLib.Search.SearchResultsHandling;
+using LegalProvisionsLib.Search.SearchResultHandling;
 
 namespace LegalProvisionsLib.Search;
 

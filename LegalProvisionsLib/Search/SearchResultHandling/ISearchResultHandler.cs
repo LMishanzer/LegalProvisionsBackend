@@ -1,6 +1,6 @@
 ﻿using LegalProvisionsLib.Search.Indexing;
 
-namespace LegalProvisionsLib.Search.SearchResultsHandling;
+namespace LegalProvisionsLib.Search.SearchResultHandling;
 
 public interface ISearchResultHandler
 {

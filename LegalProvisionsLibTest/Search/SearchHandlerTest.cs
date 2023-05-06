@@ -3,7 +3,7 @@ using LegalProvisionsLib.ProvisionStorage.Header;
 using LegalProvisionsLib.Search;
 using LegalProvisionsLib.Search.Indexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
-using LegalProvisionsLib.Search.SearchResultsHandling;
+using LegalProvisionsLib.Search.SearchResultHandling;
 using Moq;
 
 namespace LegalProvisionsLibTest.Search;
