@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace LegalProvisionsLib.TextExtracting;
+﻿namespace LegalProvisionsLib.TextExtracting;
 
 public interface ITextExtractable
 {

@@ -1,5 +1,6 @@
 ﻿using LegalProvisionsBackend.Middleware;
-using LegalProvisionsLib.DataHandling;
+using LegalProvisionsLib.DataHandling.Header;
+using LegalProvisionsLib.DataHandling.Version;
 using LegalProvisionsLib.DataPersistence;
 using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.DifferenceCalculator;
@@ -8,9 +9,13 @@ using LegalProvisionsLib.FileStorage;
 using LegalProvisionsLib.Logging;
 using LegalProvisionsLib.Logging.Persistence;
 using LegalProvisionsLib.Logging.Persistence.Elastic;
+using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.ProvisionStorage.Version;
 using LegalProvisionsLib.Search;
+using LegalProvisionsLib.Search.HeaderIndexing;
 using LegalProvisionsLib.Search.Indexing.FulltextIndexing;
 using LegalProvisionsLib.Search.Indexing.KeywordsIndexing;
+using LegalProvisionsLib.Search.VersionIndexing;
 using LegalProvisionsLib.Settings;
 using MongoDB.Driver;
 using ILogger = LegalProvisionsLib.Logging.ILogger;
@@ -30,7 +35,7 @@ public class Startup
         services.AddCors(options =>
         {
             options.AddPolicy(name: CorsPolicy,
-                policy  =>
+                policy =>
                 {
                     policy.WithOrigins("*")
                         .AllowAnyMethod()
@@ -81,7 +86,12 @@ public class Startup
         services.AddSingleton<IKeywordsIndexer, KeywordsIndexer>();
         services.AddSingleton<IFulltextIndexer, FulltextIndexer>();
         
-        services.AddTransient<IProvisionHandler, ProvisionHandler>();
+        services.AddTransient<IVersionHandler, VersionHandler>();
+        services.AddTransient<IHeaderHandler, HeaderHandler>();
+        services.AddTransient<IVersionStorage, VersionStorage>();
+        services.AddTransient<IHeaderStorage, HeaderStorage>();
+        services.AddTransient<IVersionIndexManager, VersionIndexManager>();
+        services.AddTransient<IHeaderIndexManager, HeaderIndexManager>();
         services.AddTransient<ISearchHandler, SearchHandler>();
         services.AddTransient<IDocumentManager, DocumentManager>();
         services.AddTransient<IDifferenceManager, DifferenceManager>();

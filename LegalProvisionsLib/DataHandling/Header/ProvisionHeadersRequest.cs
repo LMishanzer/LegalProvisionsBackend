@@ -1,4 +1,4 @@
-﻿namespace LegalProvisionsLib.DataHandling.Models;
+﻿namespace LegalProvisionsLib.DataHandling.Header;
 
 public class ProvisionHeadersRequest
 {

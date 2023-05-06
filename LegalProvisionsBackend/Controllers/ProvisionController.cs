@@ -1,6 +1,7 @@
-﻿using LegalProvisionsLib.DataHandling;
-using LegalProvisionsLib.DataHandling.Models;
+﻿using LegalProvisionsLib.DataHandling.Header;
 using LegalProvisionsLib.DataPersistence.Models;
+using LegalProvisionsLib.ProvisionStorage.Header;
+using LegalProvisionsLib.ProvisionStorage.Version;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -9,62 +10,66 @@ namespace LegalProvisionsBackend.Controllers;
 [Route("[controller]/[action]")]
 public class ProvisionController : Controller
 {
-    private readonly IProvisionHandler _provisionHandler;
+    private readonly IVersionStorage _versionStorage;
+    private readonly IHeaderStorage _headerStorage;
 
-    public ProvisionController(IProvisionHandler provisionHandler)
+    public ProvisionController(
+        IVersionStorage versionStorage,
+        IHeaderStorage headerStorage)
     {
-        _provisionHandler = provisionHandler;
+        _versionStorage = versionStorage;
+        _headerStorage = headerStorage;
     }
     
     [HttpGet]
     public async Task<IEnumerable<ProvisionHeader>> GetAll()
     {
-        return await _provisionHandler.GetAllProvisionsAsync();
+        return await _headerStorage.GetAllProvisionsAsync();
     }
     
     [HttpGet("{id:guid}")]
     public async Task<ProvisionVersion> GetActualVersion(Guid id)
     {
-        var provisionVersion = await _provisionHandler.GetActualProvisionVersionAsync(id);
+        var provisionVersion = await _versionStorage.GetActualProvisionVersionAsync(id);
 
         return provisionVersion;
     }
     
     [HttpGet("{id:guid}")]
-    public async Task<ProvisionHeader> GetProvisionHeader(Guid id)
+    public async Task<ProvisionHeader?> GetProvisionHeader(Guid id)
     {
-        return await _provisionHandler.GetProvisionHeaderAsync(id);
+        return await _headerStorage.GetOneAsync(id) as ProvisionHeader;
     }
     
     [HttpPost]
     public async Task<IEnumerable<ProvisionHeader>> GetProvisionHeaders([FromBody] ProvisionHeadersRequest request)
     {
-        return await _provisionHandler.GetProvisionHeadersAsync(request);
+        return await _headerStorage.GetProvisionHeadersAsync(request);
     }
     
     [HttpGet("{id:guid}/{issueDate:datetime}")]
     public async Task<ProvisionVersion> GetProvisionVersion(Guid id, DateTime issueDate)
     {
-        return await _provisionHandler.GetProvisionVersionAsync(id, issueDate);
+        return await _versionStorage.GetProvisionVersionAsync(id, issueDate);
     }
     
     [HttpGet("{versionId:guid}")]
-    public async Task<ProvisionVersion> GetProvisionVersion(Guid versionId)
+    public async Task<ProvisionVersion?> GetProvisionVersion(Guid versionId)
     {
-        return await _provisionHandler.GetProvisionVersionAsync(versionId);
+        return await _versionStorage.GetOneAsync(versionId) as ProvisionVersion;
     }
 
     [HttpPost]
     public async Task<Guid> AddProvision([FromBody] ProvisionHeaderFields headerFields)
     {
-        return await _provisionHandler.AddProvisionAsync(headerFields);
+        return await _headerStorage.AddAsync(headerFields);
     }
     
     [HttpPost]
     [Consumes("application/json")]
     public async Task<Guid> AddProvisionVersion([FromBody] ProvisionVersionFields versionFields)
     {
-        return await _provisionHandler.AddProvisionVersionAsync(versionFields);
+        return await _versionStorage.AddAsync(versionFields);
     }
 
     [HttpPut("{versionId:guid}")]
@@ -74,7 +79,7 @@ public class ProvisionController : Controller
         if (versionFields == null)
             return BadRequest("Version fields cannot be empty.");
             
-        await _provisionHandler.UpdateVersionAsync(versionId, versionFields);
+        await _versionStorage.UpdateAsync(versionId, versionFields);
 
         return Ok();
     }
@@ -82,18 +87,18 @@ public class ProvisionController : Controller
     [HttpPut("{headerId:guid}")]
     public async Task UpdateHeader(Guid headerId, [FromBody] ProvisionHeaderFields headerFields)
     {
-        await _provisionHandler.UpdateHeaderAsync(headerId, headerFields);
+        await _headerStorage.UpdateAsync(headerId, headerFields);
     }
 
     [HttpDelete("{headerId:guid}")]
     public async Task DeleteProvision(Guid headerId)
     {
-        await _provisionHandler.DeleteProvisionAsync(headerId);
+        await _headerStorage.DeleteAsync(headerId);
     }
 
     [HttpDelete("{versionId:guid}")]
     public async Task DeleteProvisionVersion(Guid versionId)
     {
-        await _provisionHandler.DeleteProvisionVersionAsync(versionId);
+        await _versionStorage.DeleteAsync(versionId);
     }
 }

@@ -1,5 +1,4 @@
-﻿using LegalProvisionsLib.DataHandling.Models;
-using LegalProvisionsLib.Differences;
+﻿using LegalProvisionsLib.Differences;
 using LegalProvisionsLib.Differences.Models;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,5 @@
-﻿namespace LegalProvisionsLib.DataHandling.Models;
+﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+namespace LegalProvisionsLib.Differences.Models;
 
 public class DifferenceRequest
 {
