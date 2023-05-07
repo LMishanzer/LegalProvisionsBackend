@@ -2,7 +2,6 @@
 using LegalProvisionsLib.Documents.Models;
 using LegalProvisionsLib.Exceptions;
 using LegalProvisionsLib.FileStorage;
-using LegalProvisionsLib.FileStorage.Models;
 using LegalProvisionsLib.ProvisionWarehouse.Version;
 
 namespace LegalProvisionsLib.Documents;

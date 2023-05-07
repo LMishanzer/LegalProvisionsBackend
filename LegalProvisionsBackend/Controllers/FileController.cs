@@ -3,7 +3,6 @@ using System.Net.Mime;
 using System.Text;
 using LegalProvisionsLib.Documents;
 using LegalProvisionsLib.Documents.Models;
-using LegalProvisionsLib.FileStorage.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LegalProvisionsBackend.Controllers;

@@ -1,6 +1,4 @@
-﻿using LegalProvisionsLib.FileStorage.Models;
-
-namespace LegalProvisionsLib.Documents.Models;
+﻿namespace LegalProvisionsLib.Documents.Models;
 
 public class Document
 {

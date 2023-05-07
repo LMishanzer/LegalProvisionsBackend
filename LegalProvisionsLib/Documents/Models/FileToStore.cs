@@ -1,4 +1,4 @@
-﻿namespace LegalProvisionsLib.FileStorage.Models;
+﻿namespace LegalProvisionsLib.Documents.Models;
 
 public class FileToStore
 {
