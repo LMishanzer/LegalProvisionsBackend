@@ -1,6 +1,5 @@
 ﻿using LegalProvisionsLib.DataPersistence.Models;
 using LegalProvisionsLib.Exceptions;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace LegalProvisionsLib.DataPersistence;
