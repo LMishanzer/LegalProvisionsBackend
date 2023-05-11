@@ -11,6 +11,7 @@ public class DifferenceCalculatorTest
     [Test]
     public void IdentityProvisionsTest()
     {
+        // Arrange
         var fields = new ProvisionVersionFields
         {
             Content = new ContentItem
@@ -31,7 +32,10 @@ public class DifferenceCalculatorTest
         var original = new ProvisionVersion(fields);
         var same = new ProvisionVersion(fields);
         
+        // Act
         var difference = _differenceCalculator.CalculateDifferences(original: original, changed: same);
+        
+        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(difference.AddedContent, Is.Empty);
@@ -44,6 +48,7 @@ public class DifferenceCalculatorTest
     [Test]
     public void ChangeTest1()
     {
+        // Arrange
         var fieldsOriginal = new ProvisionVersionFields
         {
             Content = new ContentItem
@@ -79,8 +84,10 @@ public class DifferenceCalculatorTest
         var original = new ProvisionVersion(fieldsOriginal);
         var changed = new ProvisionVersion(fieldsChanged);
 
+        // Act
         var difference = _differenceCalculator.CalculateDifferences(original, changed);
         
+        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(difference.AddedContent, Has.Count.EqualTo(1));
@@ -93,6 +100,7 @@ public class DifferenceCalculatorTest
     [Test]
     public void ChangeTest2()
     {
+        // Assert
         var fieldsOriginal = new ProvisionVersionFields
         {
             Content = new ContentItem
@@ -128,8 +136,10 @@ public class DifferenceCalculatorTest
         var original = new ProvisionVersion(fieldsOriginal);
         var changed = new ProvisionVersion(fieldsChanged);
 
+        // Act
         var difference = _differenceCalculator.CalculateDifferences(original, changed);
         
+        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(difference.AddedContent, Has.Count.EqualTo(1));
