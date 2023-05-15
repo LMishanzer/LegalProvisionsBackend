@@ -1,12 +1,12 @@
 ﻿{
-	"MongoSettings": {
-		"ConnectionUri": "mongodb://root:password@localhost:27017/?authMechanism=SCRAM-SHA-256",
-		"DatabaseName": "LegalProvisions",
-		"CollectionName": "LegalProvisions"
-	},
-	"ElasticSettings": {
-		"Url": "http://localhost:9200",
-		"DefaultIndex": "provisions",
-		"FulltextIndex": "fulltext"
-	}
+    "MongoSettings": {
+            "ConnectionUri": "mongodb://root:StrongPassword1234!@db:27017/?authMechanism=SCRAM-SHA-256",
+            "DatabaseName": "LegalProvisions",
+            "CollectionName": "LegalProvisions"
+    },
+    "ElasticSettings": {
+            "Url": "http://elastic:9200",
+            "DefaultIndex": "provisions",
+            "FulltextIndex": "fulltext"
+    }
 }
